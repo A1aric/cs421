@@ -9,7 +9,14 @@ module Lib
 -- chop :: [Int] -> [Int]
 
 chop :: [Int] -> [Int]
-chop = undefined
+chop [] = []
+chop (x:xs) =   if x == 0
+                then x : chop(xs)
+                else (x - 1) : aux (xs)
+
+aux [] = []
+aux (x:xs) = x + (length xs + 1) : xs
+
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
