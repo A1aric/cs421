@@ -15,7 +15,7 @@ chop (x:xs) =   if x == 0
                 else (x - 1) : aux (xs)
 
 aux [] = []
-aux (x:xs) = x + (length xs + 2) : xs
+aux (x:xs) = x + (length xs + 1) : xs
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
