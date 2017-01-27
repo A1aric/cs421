@@ -76,22 +76,29 @@ myzip (x:xs) (y:ys) = (x,y) : myzip xs ys
 --- ### addpairs
 
 -- don't forget to put the type declaration or you will lose points!
-addpairs = undefined
+addpairs :: (Num a) => [a] -> [a] -> [a]
+addpairs []     _       = []
+addpairs _      []      = []
+addpairs (x:xs) (y:ys)  = (myzip [x + y] [0]) : (addpairs xs ys)
+
 
 --- ### ones
 
 -- don't forget to put the type declaration or you will lose points!
-ones = undefined
+ones :: [Integer]
+ones = 1: map (+ 0) ones
 
 --- ### nats
 
 -- don't forget to put the type declaration or you will lose points!
-nats = undefined
+nats :: [Integer]
+nats = 0 : map (+ 1) nats
 
 --- ### fib
 
 -- don't forget to put the type declaration or you will lose points!
-fib = undefined
+fib :: [Integer]
+fib = 0 : 1 : [1,2,3,5,8,13]
 
 --- Set Theory
 --- ----------
@@ -99,21 +106,25 @@ fib = undefined
 --- ### add
 
 -- don't forget to put the type declaration or you will lose points!
+add :: Ord a => a -> [a] -> [a]
 add = undefined
 
 --- ### union
 
 -- don't forget to put the type declaration or you will lose points!
+union :: Ord a => [a] -> [a] -> [a]
 union = undefined
 
 --- ### intersect
 
 -- don't forget to put the type declaration or you will lose points!
+intersect :: Ord a => [a] -> [a] -> [a]
 intersect = undefined
 
 --- ### powerset
 
 -- don't forget to put the type declaration or you will lose points!
+powerset :: Ord a => [a] -> [[a]]
 powerset = undefined
 
 --- Higher Order Functions
@@ -146,21 +157,25 @@ data Exp = IntExp Integer
 --- ### list2cons
 
 -- don't forget to put the type declaration or you will lose points!
+list2cons :: [a] -> List a
 list2cons = undefined
 
 --- ### cons2list
 
 -- don't forget to put the type declaration or you will lose points!
+cons2list :: List a -> [a]
 cons2list = undefined
 
 --- ### eval
 
 -- don't forget to put the type declaration or you will lose points!
+eval :: Exp -> Integer
 eval = undefined
 
 --- ### list2cons'
 
 -- don't forget to put the type declaration or you will lose points!
+list2cons' :: [a] -> List a
 list2cons' = undefined
 
 --- ### BinTree
@@ -170,6 +185,7 @@ list2cons' = undefined
 --- ### sumTree
 
 -- don't forget to put the type declaration or you will lose points!
+--sumTree :: Num a => BinTree a -> a
 sumTree = undefined
 
 --- ### SimpVal
