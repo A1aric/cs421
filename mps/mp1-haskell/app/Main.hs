@@ -79,7 +79,7 @@ myzip (x:xs) (y:ys) = (x,y) : myzip xs ys
 addpairs :: (Num a) => [a] -> [a] -> [a]
 addpairs []     _       = []
 addpairs _      []      = []
-addpairs (x:xs) (y:ys)  = (myzip [x + y] [0]) : (addpairs xs ys)
+addpairs (x:xs) (y:ys)  = []
 
 
 --- ### ones
@@ -107,7 +107,8 @@ fib = 0 : 1 : [1,2,3,5,8,13]
 
 -- don't forget to put the type declaration or you will lose points!
 add :: Ord a => a -> [a] -> [a]
-add = undefined
+add val []     = [val]
+add val (x:xs) = []
 
 --- ### union
 
