@@ -107,8 +107,8 @@ fib = 0 : 1 : [1,2,3,5,8,13]
 
 -- don't forget to put the type declaration or you will lose points!
 add :: Ord a => a -> [a] -> [a]
-add val []     = [val]
-add val (x:xs) = []
+add val []      =   [val]
+add val (x:xs)  =   (x:xs)
 
 --- ### union
 
