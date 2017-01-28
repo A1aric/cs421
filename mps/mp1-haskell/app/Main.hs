@@ -194,7 +194,7 @@ eval = undefined
 
 -- don't forget to put the type declaration or you will lose points!
 list2cons' :: [a] -> List a
-list2cons' (x:xs) = foldr (idk) Nil
+list2cons' (x:xs) = undefined--foldr (idk) Nil
 
 --- ### BinTree
 
