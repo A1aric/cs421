@@ -47,9 +47,9 @@ rev (x:xs)  = revHelper (x:xs) []
 
 -- don't forget to put the type declaration or you will lose points!
 app :: [a] -> [a] -> [a]
-app (x:xs) []     = (x:xs)
-app []     (y:ys) = (y:ys)
-app (x:xs) (y:ys) = []
+app xx     []     = xx
+app []     yy     = yy
+app (x:xs) yy     = x : app xs yy
 
 --- ### inclist
 
@@ -77,9 +77,10 @@ myzip (x:xs) (y:ys) = (x,y) : myzip xs ys
 
 -- don't forget to put the type declaration or you will lose points!
 addpairs :: (Num a) => [a] -> [a] -> [a]
-addpairs []     _       = []
-addpairs _      []      = []
-addpairs (x:xs) (y:ys)  = []
+addpairs (xx) (yy)  = aux $ (myzip xx yy)
+        where
+            aux []         = []
+            aux ((a,b):xs) = (a + b) : aux xs
 
 
 --- ### ones
@@ -98,7 +99,7 @@ nats = 0 : map (+ 1) nats
 
 -- don't forget to put the type declaration or you will lose points!
 fib :: [Integer]
-fib = 0 : 1 : [1,2,3,5,8,13]
+fib = 0 : 1 : addpairs (fib) (tail fib)
 
 --- Set Theory
 --- ----------
@@ -107,26 +108,40 @@ fib = 0 : 1 : [1,2,3,5,8,13]
 
 -- don't forget to put the type declaration or you will lose points!
 add :: Ord a => a -> [a] -> [a]
-add val []      =   [val]
-add val (x:xs)  =   (x:xs)
+add val []      = [val]
+add val (x:xs)
+    | x > val   = val : x : xs
+    | x == val  = x : xs
+    | otherwise = x : add val (xs)
 
 --- ### union
 
 -- don't forget to put the type declaration or you will lose points!
 union :: Ord a => [a] -> [a] -> [a]
-union = undefined
+union xx [] = xx
+union [] yy = yy
+union (x:xs) (y:ys)
+    | x < y     = x : union xs (y:ys)
+    | y < x     = y : union (x:xs) ys
+    | otherwise = x : (union xs ys)
 
 --- ### intersect
 
 -- don't forget to put the type declaration or you will lose points!
 intersect :: Ord a => [a] -> [a] -> [a]
-intersect = undefined
+intersect xx     []     = []
+intersect []     yy     = []
+intersect (x:xs) (y:ys)
+    | x < y     = intersect xs (y:ys)
+    | y < x     = intersect (x:xs) ys
+    | otherwise = x : (intersect xs ys)
 
 --- ### powerset
 
 -- don't forget to put the type declaration or you will lose points!
 powerset :: Ord a => [a] -> [[a]]
-powerset = undefined
+powerset []     = [[]]
+powerset (x:xs) = union (powerset xs) (map (x:) (powerset xs))
 
 --- Higher Order Functions
 --- ----------------------
@@ -159,13 +174,15 @@ data Exp = IntExp Integer
 
 -- don't forget to put the type declaration or you will lose points!
 list2cons :: [a] -> List a
-list2cons = undefined
+list2cons []        = Nil
+list2cons (x:xs)    = Cons x (list2cons xs)
 
 --- ### cons2list
 
 -- don't forget to put the type declaration or you will lose points!
 cons2list :: List a -> [a]
-cons2list = undefined
+cons2list Nil           = []
+cons2list (Cons x (xs)) = x : cons2list xs
 
 --- ### eval
 
@@ -177,7 +194,7 @@ eval = undefined
 
 -- don't forget to put the type declaration or you will lose points!
 list2cons' :: [a] -> List a
-list2cons' = undefined
+list2cons' (x:xs) = foldr (idk) Nil
 
 --- ### BinTree
 
