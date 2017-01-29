@@ -87,7 +87,7 @@ addpairs (xx) (yy)  = aux $ (myzip xx yy)
 
 -- don't forget to put the type declaration or you will lose points!
 ones :: [Integer]
-ones = 1: map (+ 0) ones
+ones = 1 : ones
 
 --- ### nats
 
@@ -188,30 +188,42 @@ cons2list (Cons x (xs)) = x : cons2list xs
 
 -- don't forget to put the type declaration or you will lose points!
 eval :: Exp -> Integer
-eval = undefined
+eval (IntExp  (x))  = x
+eval (PlusExp (xx)) = foldr (+) 0 (map (eval) xx)
+eval (MultExp (xx)) = foldr (*) 1 (map (eval) xx)
 
 --- ### list2cons'
 
 -- don't forget to put the type declaration or you will lose points!
 list2cons' :: [a] -> List a
-list2cons' (x:xs) = undefined--foldr (idk) Nil
+list2cons' (xx) = foldr (Cons) Nil xx
 
 --- ### BinTree
 
 -- BinTree
+data BinTree a = Node a (BinTree a) (BinTree a)
+               | Leaf
+    deriving (Show)
 
 --- ### sumTree
 
 -- don't forget to put the type declaration or you will lose points!
---sumTree :: Num a => BinTree a -> a
-sumTree = undefined
+sumTree :: Num a => BinTree a -> a
+sumTree (Node x (xx) (yy)) = x + sumTree xx + sumTree yy
+sumTree (Leaf) = 0
 
 --- ### SimpVal
 
 -- SimpVal
+data SimpVal = IntVal  Integer
+             | BoolVal Bool
+             | StrVal  String
+             | ExnVal  String
+    deriving (Show)
 
 --- ### liftIntOp
 
 -- don't forget to put the type declaration or you will lose points!
---liftIntOp :: (Integer -> Integer -> Integer) -> SimpVal -> SimpVal -> SimpVal
-liftIntOp = undefined
+liftIntOp :: (Integer -> Integer -> Integer) -> SimpVal -> SimpVal -> SimpVal
+liftIntOp f (IntVal x) (IntVal y)  = IntVal (f x y)
+liftIntOp _ _          _           = ExnVal "not an IntVal!"
