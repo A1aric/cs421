@@ -404,3 +404,9 @@ exec (IfStmt e s1 s2) penv env = case eval e env of
                                  _             -> ("exn: Condition is not a Bool", penv, env)
 
 --- ### Procedure and Call Statements
+exec (ProcedureStmt a xs b) penv env = ("", H.insert (a) (ProcedureStmt a xs b) penv, env)
+
+
+exec (CallStmt a (xx))    penv env = case (H.lookup a penv) of
+                                       Nothing                        -> ("Procedure " ++ a ++ " undefined", penv, env)
+                                       Just (ProcedureStmt name ys c) -> exec (c) penv (H.union (H.fromList (zip ys (map (\z -> eval z env) xx))) (env))
