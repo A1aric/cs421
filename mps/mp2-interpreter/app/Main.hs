@@ -386,10 +386,9 @@ eval (LetExp xs e) env = eval e (H.union (H.fromList (zip (map (\(a, b) -> a) xs
 exec :: Stmt -> PEnv -> Env -> Result
 exec (PrintStmt e) penv env = (val, penv, env)
     where val = show $ eval e env
-exec _ _ _ = undefined
 
 --- ### Set Statements
-
+exec (SetStmt x e) penv env = ("", penv, H.insert x (eval e env) env)
 --- ### Sequencing
 
 --- ### If Statements
