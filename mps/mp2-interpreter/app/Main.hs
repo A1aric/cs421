@@ -389,8 +389,18 @@ exec (PrintStmt e) penv env = (val, penv, env)
 
 --- ### Set Statements
 exec (SetStmt x e) penv env = ("", penv, H.insert x (eval e env) env)
+
 --- ### Sequencing
+exec (SeqStmt [])     penv env = ("", penv, env)
+exec (SeqStmt (x:xs)) penv env = (y1 ++ y2, newnewpenv, newnewenv)
+            where
+                (y1, newpenv,    newenv)    = exec x            penv    env
+                (y2, newnewpenv, newnewenv) = exec (SeqStmt xs) newpenv newenv
 
 --- ### If Statements
+exec (IfStmt e s1 s2) penv env = case eval e env of
+                                 BoolVal True  -> exec s1 penv env
+                                 BoolVal False -> exec s2 penv env
+                                 _             -> ("exn: Condition is not a Bool", penv, env)
 
 --- ### Procedure and Call Statements
