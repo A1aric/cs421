@@ -324,36 +324,61 @@ main = do
 --- -----------------
 
 liftIntOp :: (Int -> Int -> Int) -> Val -> Val -> Val
-liftIntOp op (IntVal x) (IntVal y) = IntVal $ op x y
-liftIntOp _ _ _ = ExnVal "Cannot lift"
+-- case of division by 0 must be checked first for pattern matching
+liftIntOp div   _          (IntVal 0) = ExnVal "Division by 0"
+liftIntOp op    (IntVal x) (IntVal y) = IntVal $ op x y
+liftIntOp _     _           _         = ExnVal "Cannot lift"
 
 liftBoolOp :: (Bool -> Bool -> Bool) -> Val -> Val -> Val
 liftBoolOp op (BoolVal x) (BoolVal y) = BoolVal $ op x y
-liftBoolOp _ _ _ = ExnVal "Cannot lift"
+liftBoolOp _  _           _           = ExnVal "Cannot lift"
 
 liftCompOp :: (Int -> Int -> Bool) -> Val -> Val -> Val
 liftCompOp op (IntVal x) (IntVal y) = BoolVal $ op x y
-liftCompOp _ _ _ = ExnVal "Cannot lift"
+liftCompOp _  _          _          = ExnVal "Cannot lift"
 --- Eval
 --- ----
 
 eval :: Exp -> Env -> Val
 
 --- ### Constants
-eval (IntExp (x)) env = IntVal x
-eval (BoolExp (x)) env = BoolVal x
+eval (IntExp x)  env = IntVal x
+eval (BoolExp x) env = BoolVal x
 
 --- ### Variables
--- eval (IntOpExp op x1 x2) = 
+eval (VarExp x) env = case H.lookup x env of
+                      Nothing -> ExnVal "No match in env"
+                      Just v -> v
+
 --- ### Arithmetic
+eval (IntOpExp op x y) env =
+    let Just v = H.lookup op intOps
+    in liftIntOp v (eval x env) (eval y env)
 
 --- ### Boolean and Comparison Operators
+eval (BoolOpExp op x y) env =
+    let Just v = H.lookup op boolOps
+    in liftBoolOp v (eval x env) (eval y env)
+
+eval (CompOpExp op x y) env =
+    let Just v = H.lookup op compOps
+    in liftCompOp v (eval x env) (eval y env)
 
 --- ### If Expressions
+eval (IfExp op x y) env = case eval op env of
+                          BoolVal True -> eval x env
+                          BoolVal False -> eval y env
+                          _     -> ExnVal "Condition is not a Bool"
 
 --- ### Functions and Function Application
+eval (FunExp xx y) env = CloVal xx y env
+
+eval (AppExp func xs) env = case eval func env of
+                            (CloVal ys newfunc newenv) -> eval (newfunc) (H.union (H.fromList (zip ys (map (\zs -> eval zs env) xs))) newenv)
+                            _                        -> ExnVal "Apply to non-closure"
 
 --- ### Let Expressions
+eval (LetExp xs e) env = eval e (H.union (H.fromList (zip (map (\(a, b) -> a) xs) (map (\(a, b) -> eval b env) xs))) env)
 
 --- Statements
 --- ----------
