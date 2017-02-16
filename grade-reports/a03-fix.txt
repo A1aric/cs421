@@ -13,9 +13,9 @@ Linking .stack-work/dist/x86_64-linux-nopie/Cabal-1.24.0.0/build/a03-fix-test/a0
 Warning: File listed in a03-fix.cabal file does not exist: README.md
 a03-fix-0.1.0.0: copy/register
 Installing library in
-/home/mattox/tmp/tmp.fDaDbqDpz5/a03-fix/.stack-work/install/x86_64-linux-nopie/lts-7.16/8.0.1/lib/x86_64-linux-ghc-8.0.1/a03-fix-0.1.0.0-Ff2iC75U6QJ26jSFuj1jkr
+/home/mattox/tmp/tmp.Zw0iIyg3wZ/a03-fix/.stack-work/install/x86_64-linux-nopie/lts-7.16/8.0.1/lib/x86_64-linux-ghc-8.0.1/a03-fix-0.1.0.0-Ff2iC75U6QJ26jSFuj1jkr
 Installing executable(s) in
-/home/mattox/tmp/tmp.fDaDbqDpz5/a03-fix/.stack-work/install/x86_64-linux-nopie/lts-7.16/8.0.1/bin
+/home/mattox/tmp/tmp.Zw0iIyg3wZ/a03-fix/.stack-work/install/x86_64-linux-nopie/lts-7.16/8.0.1/bin
 Registering a03-fix-0.1.0.0...
 a03-fix-0.1.0.0: test (suite: a03-fix-test)
 
