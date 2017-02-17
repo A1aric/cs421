@@ -18,7 +18,7 @@ module Lib
 
 -- Here are the originals.
 
-fix f x = 
+fix f x =
   if x == result
     then x
     else fix f result
@@ -36,13 +36,26 @@ foo p (x:y:xs) | p x = 2 * x + y : foo p xs
 
 -- Assume that the f argument takes a continuation now.
 
-fixk = undefined
+fixk f x k =
+  f x (\result ->
+         if x == result
+         then k x
+         else fixk f result k)
 
 -- Write this by calling fixk.  The solution is one line.
 
-multifook = undefined
+multifook p xx k = fixk (fook p) xx k
 
-fook = undefined
+fook p []  k = k []
+fook p [x] k =
+   p x (\res -> if res then k [x] else k [])
+fook p (x:y:xs) k =
+  p x (\res ->
+         if res then
+           fook p xs (\res -> k $ 2 * x + y : res)
+         else
+           fook p (y:xs) (\res -> k $ x : res)
+           )
 
 -- Utilities
 -- Use these to test your code if you want
