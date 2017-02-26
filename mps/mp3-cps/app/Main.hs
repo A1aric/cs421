@@ -201,12 +201,17 @@ main = do putStrLn "Welcome to the CPS Transformer!"
 --- ### `factk :: Integer -> (Integer -> t) -> t`
 
 factk :: Integer -> (Integer -> t) -> t
-factk = undefined
+factk 0 con = con 1
+factk n con = factk (n-1) (\curr -> con $ curr * n)
 
 --- ### `evenoddk :: [Integer] -> (Integer -> t) -> (Integer -> t) -> t`
 
 evenoddk :: [Integer] -> (Integer -> t) -> (Integer -> t) -> t
-evenoddk = undefined
+evenoddk [x] ev od  | even x =    ev x
+                    | otherwise = od x
+
+evenoddk (x:xs) ev od | even x =    evenoddk xs (\val -> ev $ val + x) od
+                      | otherwise = evenoddk xs ev                     (\val -> od $ val + x)
 
 --- Automated Translation
 --- ---------------------
@@ -217,22 +222,53 @@ gensym i = ("v" ++ show i, i + 1)
 --- ### Define `isSimple`
 
 isSimple :: Exp -> Bool
-isSimple = undefined
+isSimple (VarExp _     ) = True
+isSimple (IntExp _     ) = True
+isSimple (AppExp _  _  ) = False
+isSimple (IfExp  x  y z) = isSimple x && isSimple y && isSimple z
+isSimple (OpExp  op x y) = isSimple x && isSimple y
+isSimple (LamExp _  _  ) = True
 
 --- ### `cpsExp :: Exp -> Exp -> Integer -> (Exp, Integer)`
 
-cpsExp :: Exp -> Exp -> Integer -> (Exp, Integer)
-cpsExp = undefined
+-- IntExp Integer
+--          | VarExp String
+--          | LamExp String Exp
+--          | IfExp Exp Exp Exp
+--          | OpExp String Exp Exp
+--          | AppExp Exp Exp
 
+
+cpsExp :: Exp -> Exp -> Integer -> (Exp, Integer)
 --- #### Define `cpsExp` for Integer and Variable Expressions
+cpsExp (VarExp x     ) con val = (AppExp con (VarExp x), val)
+cpsExp (IntExp x     ) con val = (AppExp con (IntExp x), val)
 
 --- #### Define `cpsExp` for If Expressions
-
+cpsExp (IfExp  x  y z) con val  | isSimple x = (IfExp x newy newz, val)
+                                | otherwise  = if   newx
+                                               then newy
+                                               else newz --IfExp con $ (\v -> cpsExp v con val)
+                                where (newx, _) = cpsExp x con val
+                                      (newy, _) = cpsExp y con val
+                                      (newz, _) = cpsExp z con val
 --- #### Define `cpsExp` for Operator Expressions
+cpsExp (OpExp  op x y) con val =
+    case (isSimple x, isSimple y) of
+        (True, True)   -> (AppExp con (OpExp op x y), val)
+        (False, True)  -> cpsExp x (LamExp name (AppExp con (OpExp op (VarExp name) y))) s
+               where (name, s) = gensym val
+        (True, False)  -> cpsExp y (LamExp name (AppExp con (OpExp op x (VarExp name)))) s
+               where (name, s) = gensym val
+        (False, False) -> (AppExp con (OpExp op x y), val)
 
 --- #### Define `cpsExp` for Application Expressions
+cpsExp (AppExp x  y  ) con val | isSimple y = (AppExp newx newy, val)
+                               | otherwise  = (AppExp x y, val)
+                               where (newx, _) = cpsExp x con val
+                                     (newy, _) = cpsExp y con val
 
 --- ### Define `cpsDecl`
 
 cpsDecl :: Stmt -> Stmt
-cpsDecl = undefined
+cpsDecl (Decl s xs e) = undefined
