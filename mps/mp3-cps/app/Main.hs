@@ -227,7 +227,6 @@ isSimple (IntExp _     ) = True
 isSimple (AppExp _  _  ) = False
 isSimple (IfExp  x  y z) = isSimple x && isSimple y && isSimple z
 isSimple (OpExp  op x y) = isSimple x && isSimple y
-isSimple (LamExp _  _  ) = True
 
 --- ### `cpsExp :: Exp -> Exp -> Integer -> (Exp, Integer)`
 
@@ -246,29 +245,34 @@ cpsExp (IntExp x     ) con val = (AppExp con (IntExp x), val)
 
 --- #### Define `cpsExp` for If Expressions
 cpsExp (IfExp  x  y z) con val  | isSimple x = (IfExp x newy newz, val)
-                                | otherwise  = if   newx
-                                               then newy
-                                               else newz --IfExp con $ (\v -> cpsExp v con val)
-                                where (newx, _) = cpsExp x con val
+                                | otherwise  = cpsExp x (LamExp othertemp (IfExp (VarExp othertemp) newy newz)) val1
+                                where (othertemp, val1) = gensym val
                                       (newy, _) = cpsExp y con val
                                       (newz, _) = cpsExp z con val
 --- #### Define `cpsExp` for Operator Expressions
 cpsExp (OpExp  op x y) con val =
     case (isSimple x, isSimple y) of
         (True, True)   -> (AppExp con (OpExp op x y), val)
-        (False, True)  -> cpsExp x (LamExp name (AppExp con (OpExp op (VarExp name) y))) s
-               where (name, s) = gensym val
-        (True, False)  -> cpsExp y (LamExp name (AppExp con (OpExp op x (VarExp name)))) s
-               where (name, s) = gensym val
-        (False, False) -> (AppExp con (OpExp op x y), val)
+        (False, True)  -> cpsExp x (LamExp v (AppExp con (OpExp op (VarExp v) y))) val'
+                        where
+                            (v, val') = gensym val
+        (True, False)  -> cpsExp y (LamExp v (AppExp con (OpExp op x (VarExp v)))) val'
+                        where
+                            (v, val') = gensym val
+        (False, False) -> cpsExp x (LamExp v1 ce2) val'''
+                        where
+                            (v1, val') = gensym val
+                            (v2, val'') = gensym val'
+                            base = LamExp v2 (AppExp con (OpExp op (VarExp v1) (VarExp v2)))
+                            (ce2, val''') = cpsExp y base val''
 
 --- #### Define `cpsExp` for Application Expressions
-cpsExp (AppExp x  y  ) con val | isSimple y = (AppExp newx newy, val)
-                               | otherwise  = (AppExp x y, val)
-                               where (newx, _) = cpsExp x con val
-                                     (newy, _) = cpsExp y con val
+cpsExp (AppExp x  y  ) con val | isSimple y = (AppExp (AppExp x y) $ con, val)
+                               | otherwise  = cpsExp y (LamExp v (AppExp (AppExp x (VarExp v) ) con )) val
+                               where (v, val') = gensym val
 
 --- ### Define `cpsDecl`
 
 cpsDecl :: Stmt -> Stmt
-cpsDecl (Decl s xs e) = undefined
+cpsDecl (Decl f xs e) = Decl (f) (xs ++ ["k"]) con
+                        where (con, _) = (cpsExp e (VarExp "k") 1)

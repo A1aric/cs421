@@ -15,4 +15,5 @@ instance Applicative Counter where
 
 instance Monad Counter where
     return x = Counter x 0
-    Counter a i >>= f = undefined  --- YOUR CODE HERE
+    Counter a i >>= f = Counter b (c + 1)
+                        where Counter b c = f a
