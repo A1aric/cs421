@@ -268,7 +268,7 @@ cpsExp (OpExp  op x y) con val =
 
 --- #### Define `cpsExp` for Application Expressions
 cpsExp (AppExp x  y  ) con val | isSimple y = (AppExp (AppExp x y) $ con, val)
-                               | otherwise  = cpsExp y (LamExp v (AppExp (AppExp x (VarExp v) ) con )) val
+                               | otherwise  = cpsExp y (LamExp v (AppExp (AppExp x (VarExp v)) con)) val
                                where (v, val') = gensym val
 
 --- ### Define `cpsDecl`
