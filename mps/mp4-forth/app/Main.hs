@@ -142,7 +142,12 @@ splitWellNested (start,end) words = splitWN 0 [] words
 
 -- ifs have an optional `else` which also must be well-nested
 splitIf :: [String] -> ([String], [String], [String])
-splitIf = undefined
+splitIf xx  = in case xx of
+    []          -> undefined
+    otherwise   -> undefined
+    where
+        (if_clause, then_clause) = splitWellNested ("if", "then") list
+
 
 --- The Evaluator
 --- -------------
