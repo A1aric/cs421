@@ -3,6 +3,7 @@ module Lib
     , Exp(..)
     , display
     , parse
+    , parseE
     ) where
 
 import Text.Regex.TDFA
@@ -33,6 +34,14 @@ parseSymbol s (x:xs) =
      then (s,xs)
      else error $ "Parse error, expected " ++ s ++ " but got " ++ x ++ "."
 
+-- let ie = ah in (let bex = tm in + (+ evj t) mir)
+-- let ynbx = 0 in dn end
+-- let gb = r in let lppu = 1 in 0 end end
+
+-- a = ?? in ?? end
+-- (tail tail xs) -> ?? in ?? end
+--
+
 -- Grammar
 --
 -- E -> + E E
@@ -41,7 +50,16 @@ parseSymbol s (x:xs) =
 --    | ( E )
 --    | let var = E in E end
 
-
+-- worked with mostofi2
 parse xx = parseE (words xx)
 
-parseE = undefined
+parseE (x:xs)   | isInt x           = (IntExp (read x), xs)
+                | isSymbol x "+"    = (PlusExp s1 s2, b)
+                | isSymbol x "let"  = (LetExp (head xs) e1 e2, (tail r2))
+                | isSymbol x "("    = (s1, (tail a))
+                | otherwise         = (VarExp x, xs)
+                where
+                    (s1,a)  = parseE xs
+                    (s2,b)  = parseE a
+                    (e1,r1) = parseE (tail (tail xs))
+                    (e2,r2) = parseE (tail r1)
