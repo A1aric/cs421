@@ -104,7 +104,10 @@ liftIntOp _  _        = underflow
 --- ### `liftCompOp`
 
 liftCompOp :: (Integer -> Integer -> Bool) -> IStack -> IStack
-liftCompOp = undefined
+liftCompOp op (x:y:xs)  =   if (y `op` x)
+                            then 420 : xs
+                            else 0 : xs
+liftCompOp _  _         = underflow
 
 --- The Dictionary
 --- --------------
@@ -115,13 +118,22 @@ initialDictionary = initArith ++ initComp
 --- ### Arithmetic Operators
 
 initArith :: Dictionary
-initArith = [ ("+",  [Prim (liftIntOp  (+))])
+initArith = [   ("+", [Prim (liftIntOp (+))]),
+                ("-", [Prim (liftIntOp (-))]),
+                ("*", [Prim (liftIntOp (*))]),
+                ("/", [Prim (liftIntOp (div))])
             ]
 
 --- ### Comparison Operators
 
 initComp :: Dictionary
-initComp = []
+initComp =  [   (">",  [Prim (liftCompOp (>))]),
+                ("<",  [Prim (liftCompOp (<))]),
+                (">=", [Prim (liftCompOp (>=))]),
+                ("<=", [Prim (liftCompOp (<=))]),
+                ("==", [Prim (liftCompOp (==))]),
+                ("!=", [Prim (liftCompOp (/=))])
+            ]
 
 --- The Parser
 --- ----------
@@ -142,12 +154,13 @@ splitWellNested (start,end) words = splitWN 0 [] words
 
 -- ifs have an optional `else` which also must be well-nested
 splitIf :: [String] -> ([String], [String], [String])
-splitIf xx  = in case xx of
-    []          -> undefined
-    otherwise   -> undefined
+splitIf xx  = case then2 of
+    []          -> (if2, else1, then1)
+    otherwise   -> (else2 ++ ["then"], tail then2, then1)
     where
-        (if_clause, then_clause) = splitWellNested ("if", "then") list
-
+        (if1, then1)    = splitWellNested ("if", "then")    xx
+        (if2, else1)    = splitWellNested ("if", "else")    if1
+        (else2, then2)  = splitWellNested ("else", "then")  if1
 
 --- The Evaluator
 --- -------------
@@ -165,17 +178,48 @@ eval (".":words) (i:istack, cstack, dict, out)
 eval (".":words) _ = underflow
 
 --- ### Printing the Stack
+eval (".S":words) (istack, cstack, dict, out)
+    = eval words (istack, cstack, dict, (intercalate " " $ map show (reverse istack)):out)
 
 --- ### Stack Manipulations
+eval ("dup":words) ([], cstack, dict, out) = ([], cstack, dict, out)
+eval ("dup":words) (i:istack, cstack, dict, out) = eval words (i:i:istack, cstack, dict, out)
+
+eval ("swap":words) ([], cstack, dict, out) = ([], cstack, dict, out)
+eval ("swap":words) (i:j:istack, cstack, dict, out) = eval words (j:i:istack, cstack, dict, out)
+
+eval ("drop":words) ([], cstack, dict, out) = ([], cstack, dict, out)
+eval ("drop":words) (i:istack, cstack, dict, out) = eval words (istack, cstack, dict, out)
+
+eval ("rot":words) ([], cstack, dict, out) = ([], cstack, dict, out)
+eval ("rot":words) (i:j:k:istack, cstack, dict, out) = eval words (k:i:j:istack, cstack, dict, out)
 
 --- ### User definitions
+eval (":":words) (istack, cstack, dict, out) =
+    case part1 of
+        []          -> eval part2 (istack, cstack, dict, out)
+        otherwise   -> eval part2 (istack, cstack, dict_new, out)
+    where   dict_new = undefined --dinsert (head part2) (tail part2) dict
+            (part1, part2) = splitWellNested (":", ";") words
 
 --- ### Conditionals
+eval (op:"if":words) (istack, cstack, dict, out) =
+        let (nistack, ncstack, ndict, nout) = eval (cond:[]) (istack,cstack,dict,out)
+        in case nistack of
+            i:is -> case i of
+                (-1) -> eval (tr ++ th) (is, cstack, dict, out)
+                (0)  -> eval (fa ++ th) (is, cstack, dict, out)
+            _    -> underflow
+        where
+            (tr, fa, th) = splitIf words
+-- call splitIf or something
 
 --- ### Loops
-
+eval ("begin":words) (istack, cstack, dict, out) =
+    eval body (istack, (("begin":words):cstack), dict, out)
+    where
+        (body, loop) = splitWellNested ("begin", "again") words
 --- ### Lookup in dictionary
-
 -- otherwise it should be handled by `dlookup` to see if it's a `Num`, `Prim`,
 -- `Def`, or `Unknown`
 eval (word:words) (istack, cstack, dict, out)
