@@ -105,8 +105,8 @@ liftIntOp _  _        = underflow
 
 liftCompOp :: (Integer -> Integer -> Bool) -> IStack -> IStack
 liftCompOp op (x:y:xs)  =   if (y `op` x)
-                            then 420 : xs
-                            else 0 : xs
+                            then -1 : xs
+                            else 0  : xs
 liftCompOp _  _         = underflow
 
 --- The Dictionary
@@ -178,47 +178,49 @@ eval (".":words) (i:istack, cstack, dict, out)
 eval (".":words) _ = underflow
 
 --- ### Printing the Stack
-eval (".S":words) (istack, cstack, dict, out)
-    = eval words (istack, cstack, dict, (intercalate " " $ map show (reverse istack)):out)
+eval (".S":words) (istack, cstack, dict, out) = eval words (istack, cstack, dict, (intercalate " " $ map show (reverse istack)):out)
 
 --- ### Stack Manipulations
-eval ("dup":words) ([], cstack, dict, out) = ([], cstack, dict, out)
-eval ("dup":words) (i:istack, cstack, dict, out) = eval words (i:i:istack, cstack, dict, out)
+eval ("dup":words) (i:istack, cstack, dict, out)        = eval words (i:i:istack, cstack, dict, out)
+eval ("dup":words) _                                    = underflow
 
-eval ("swap":words) ([], cstack, dict, out) = ([], cstack, dict, out)
-eval ("swap":words) (i:j:istack, cstack, dict, out) = eval words (j:i:istack, cstack, dict, out)
+eval ("swap":words) (i:j:istack, cstack, dict, out)     = eval words (j:i:istack, cstack, dict, out)
+eval ("swap":words) _                                   = underflow
 
-eval ("drop":words) ([], cstack, dict, out) = ([], cstack, dict, out)
-eval ("drop":words) (i:istack, cstack, dict, out) = eval words (istack, cstack, dict, out)
+eval ("drop":words) (i:istack, cstack, dict, out)       = eval words (istack, cstack, dict, out)
+eval ("drop":words) _                                   = underflow
 
-eval ("rot":words) ([], cstack, dict, out) = ([], cstack, dict, out)
-eval ("rot":words) (i:j:k:istack, cstack, dict, out) = eval words (k:i:j:istack, cstack, dict, out)
+eval ("rot":words) (i:j:k:istack, cstack, dict, out)    = eval words (k:i:j:istack, cstack, dict, out)
+eval ("rot":words) _                                    = underflow
 
 --- ### User definitions
 eval (":":words) (istack, cstack, dict, out) =
-    case part1 of
-        []          -> eval part2 (istack, cstack, dict, out)
-        otherwise   -> eval part2 (istack, cstack, dict_new, out)
-    where   dict_new = undefined --dinsert (head part2) (tail part2) dict
-            (part1, part2) = splitWellNested (":", ";") words
+    let (part1, part2) =  splitWellNested  (":", ";") words
+    in case part1 of
+        []      -> eval part2 (istack, cstack, dict, out)
+        rest    -> eval part2 (istack, cstack, newdict, out)
+            where newdict = dinsert (head rest) (Def $ (tail rest)) dict
 
 --- ### Conditionals
-eval (op:"if":words) (istack, cstack, dict, out) =
-        let (nistack, ncstack, ndict, nout) = eval (cond:[]) (istack,cstack,dict,out)
-        in case nistack of
-            i:is -> case i of
-                (-1) -> eval (tr ++ th) (is, cstack, dict, out)
-                (0)  -> eval (fa ++ th) (is, cstack, dict, out)
-            _    -> underflow
+eval ("if":words) (i:istack, cstack, dict, out) =
+        case i of
+            0           -> eval (false_st ++ then_st) (istack, cstack, dict, out)
+            otherwise   -> eval (true_st ++ then_st) (istack, cstack, dict, out)
         where
-            (tr, fa, th) = splitIf words
--- call splitIf or something
+            (true_st, false_st, then_st) = splitIf words -- split line into if then else for parsing
 
 --- ### Loops
 eval ("begin":words) (istack, cstack, dict, out) =
-    eval body (istack, (("begin":words):cstack), dict, out)
+    eval body (istack, (["begin"]++body++["again"]):rest:cstack, dict, out)
     where
-        (body, loop) = splitWellNested ("begin", "again") words
+        (body, rest) = splitWellNested ("begin", "again") words
+
+eval ("exit":words) (istack, c:cstack, dict, out) =
+    if head c == "begin"
+    then eval []                (istack, cstack, dict, out)
+    else eval ("exit":words)    (istack, cstack, dict, out)
+
+
 --- ### Lookup in dictionary
 -- otherwise it should be handled by `dlookup` to see if it's a `Num`, `Prim`,
 -- `Def`, or `Unknown`
