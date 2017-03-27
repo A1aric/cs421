@@ -26,4 +26,4 @@ All tests passed.
 Score: 100.0
 
 
-Late Score: 100.0
+Late Score: 80.0
