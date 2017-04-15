@@ -1,0 +1,21 @@
+Problem grade report.
+Problem slug: code-hs-functorWrite-04
+Netid: ptwrdhn2
+
+Your Submission:
+
+----------------------------------------
+data Foo a = Foo a
+           | Bar
+  deriving Show
+
+instance Applicative Foo where
+   pure a = (Foo a)
+   (<*>) (Foo f) (Foo a) = (Foo (f a))
+
+----------------------------------------
+
+Grading and comments
+Max score: 10
+You need to handle the Bar case (-3)
+Final score: 7

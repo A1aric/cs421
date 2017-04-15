@@ -1,0 +1,16 @@
+Problem grade report.
+Problem slug: code-hs-recursionList-unzipFst
+Netid: ptwrdhn2
+
+Your Submission:
+
+----------------------------------------
+unzipFst :: [(a, b)] -> [a]
+unzipFst []	= []
+unzipFst ((a,b):xs) = a : unzipFst xs
+----------------------------------------
+
+Grading and comments
+Max score: 10
+Correct (0)
+Final score: 10

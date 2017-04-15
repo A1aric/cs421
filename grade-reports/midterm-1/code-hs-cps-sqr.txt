@@ -1,0 +1,15 @@
+Problem grade report.
+Problem slug: code-hs-cps-sqr
+Netid: ptwrdhn2
+
+Your Submission:
+
+----------------------------------------
+sqrk x k = k $ x * x
+hypotsqrk a b k = k $ sqrk a k + sqrk b k
+----------------------------------------
+
+Grading and comments
+Max score: 10
+correct answer (0)
+Final score: 10

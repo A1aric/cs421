@@ -1,0 +1,17 @@
+Problem grade report.
+Problem slug: code-hs-hofWrite-map
+Netid: ptwrdhn2
+
+Your Submission:
+
+----------------------------------------
+mymap :: (a -> b) -> [a] -> [b]
+mymap f []	= []
+mymap f (x:xs) 	= (f x) : mymap f xs
+
+----------------------------------------
+
+Grading and comments
+Max score: 10
+Good! (0)
+Final score: 10
