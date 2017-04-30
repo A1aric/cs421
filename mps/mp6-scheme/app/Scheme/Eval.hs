@@ -97,8 +97,8 @@ eval expr@(List lst) = evalList $ map flattenList lst where
 
     -- quote
     -- TODO
-    evalList [Symbol "quote", e] = unimplemented "Special form `quote`"
-
+    evalList [Symbol "quote", e] = --unimplemented "Special form `quote`"
+        return e
     -- unquote (illegal at surface evaluation)
     -- TODO: since surface-level `unquote` is illegal, all you need to do is
     -- to throw a diagnostic
@@ -132,8 +132,9 @@ eval expr@(List lst) = evalList $ map flattenList lst where
     -- let
     -- TODO: Handle `let` here. Use pattern matching to match the syntax
     evalList [Symbol "let", List (exps), body] = --unimplemented "let"
-        do  val <- (\(k, v) -> modify $ H.insert k v) <$> mapM getBinding exps
-            res <- eval body
+        do  let temp = mapM getBinding exps
+            val     <- fmap (\(k, v) -> modify $ H.insert k v) temp
+            res     <- eval body
             return res
 
     -- let*
@@ -168,11 +169,11 @@ eval expr@(List lst) = evalList $ map flattenList lst where
     -- define-macro
     -- TODO: Handle `define-macro` here. Use pattern matching to match
     -- the syntax
-    evalList [Symbol "define-macro", List (Symbol fname : args), body] = undefined
-    --     do  --env <- get
-    --         val <- eval body
-    --         modify $ H.insert var val
-    --         return Void
+    evalList [Symbol "define-macro", List (Symbol fname : args), body] = -- unimplemented "define-macro"
+        do  -- env <- get
+            val <- eval body
+            modify $ H.insert fname (Macro (map show args) body)
+            return Void
 
     -- invalid use of keyword, throw a diagnostic
     evalList (Symbol sym : _) | elem sym keywords = invalidSpecialForm sym
