@@ -18,22 +18,26 @@ printLn str = hPutStrLn stdout str >> hFlush stdout
 
 repl :: Env -> IO ()
 repl env = do
-  putStr "scheme> "
-  l <- getLine                                        -- Read
-  case parse exprP "Expression" l of                  -- Parse
-    Left err -> print err                             -- Diagnostics
-    Right expr ->
-      case runExcept $ runStateT (eval expr) env of   -- Eval
-        -- TODO:
-        -- Insert line here: If error, print error
-        -- Insert line here: If return value is void,
-        --                    loop with new env without printing
-        -- Insert line here: Otherwise, print and loop with new env
-        --
-        -- The following line may be removed when you're done implementing
-        --  the cases above:
-        _ -> print "Error in Main.hs: Finish implementing repl"
-  repl env                                            -- Loop with old env
+    putStr "scheme> "
+    l <- getLine                                            -- Read
+    case parse exprP "Expression" l of                      -- Parse
+        Left err -> print err                               -- Diagnostics
+        Right expr ->
+            case runExcept $ runStateT (eval expr) env of   -- Eval
+                -- TODO:
+                -- Insert line here: If error, print error
+                Left a      -> print a
+                -- Insert line here: If return value is void,
+                --                    loop with new env without printing
+                Right (ret, n_env) -> case ret of
+                    Void    -> repl n_env
+                -- Insert line here: Otherwise, print and loop with new env
+                    otherwise       -> do   print ret
+                                            repl n_env
+                -- The following line may be removed when you're done implementing
+                --  the cases above:
+                -- _ -> print "Error in Main.hs: Finish implementing repl"
+    repl env                                            -- Loop with old env
 
 main :: IO ()
 main = repl runtime

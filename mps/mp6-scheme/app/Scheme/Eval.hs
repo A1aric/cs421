@@ -61,19 +61,24 @@ eval :: Val -> EvalState Val
 
 -- Self-evaluating expressions
 -- TODO: What's self-evaluating?
-eval v@(Number _) = unimplemented "Evaluating numbers"
-eval v@(Boolean _) = unimplemented "Evaluating booleans"
+eval v@(Number _) = return v
+eval v@(Boolean _) = return v
 
 -- Symbol evaluates to the value bound to it
 -- TODO
-eval (Symbol sym) = unimplemented "Evaluating symbols"
+eval (Symbol sym) =
+    do  t_env   <-  get
+        let a   =   H.lookup sym t_env
+        case a of
+            Just b  -> return b
+            Nothing -> throwError $ UndefSymbolError sym
 
 -- Dotted list may just be an equivalent representation of List.
 -- We simply try to flatten the list. If it's still dotted after
 -- flattening, it's an invalid expression.
 eval expr@(DottedList _ _) = case flattenList expr of
-  DottedList _ _ -> throwError $ InvalidExpression expr
-  v -> eval v
+    DottedList _ _ -> throwError $ InvalidExpression expr
+    v -> eval v
 
 -- List evaluates as a form of the following
 -- 1. Special form (`define`, `let`, `let*`, `cond`, `quote`, `quasiquote`,
@@ -97,18 +102,19 @@ eval expr@(List lst) = evalList $ map flattenList lst where
     -- unquote (illegal at surface evaluation)
     -- TODO: since surface-level `unquote` is illegal, all you need to do is
     -- to throw a diagnostic
-    evalList [Symbol "unquote", e] = unimplemented "Special form `unquote`"
+    evalList [Symbol "unquote", e] = --unimplemented "Special form `unquote`"
+        throwError $ UnquoteNotInQuasiquote e
 
     -- quasiquote
     evalList [Symbol "quasiquote", e] = evalQuasi 1 e where
-      evalQuasi :: Int -> Val -> EvalState Val
-      evalQuasi 0 (List [Symbol "unquote", v]) = throwError $ UnquoteNotInQuasiquote v
-      evalQuasi 1 (List [Symbol "unquote", v]) = eval v
-      evalQuasi n (List ee@[Symbol "quasiquote", _]) = List <$> evalQuasi (n+1) `mapM` ee
-      evalQuasi n (List ee@[Symbol "unquote", _]) = List <$> evalQuasi (n-1) `mapM` ee
-      evalQuasi n (List xx) = List <$> mapM (evalQuasi n) xx
-      evalQuasi n (DottedList xx y) = DottedList <$> mapM (evalQuasi n) xx <*> evalQuasi n y
-      evalQuasi _ v = return v
+        evalQuasi :: Int -> Val -> EvalState Val
+        evalQuasi 0 (List [Symbol "unquote", v]) = throwError $ UnquoteNotInQuasiquote v
+        evalQuasi 1 (List [Symbol "unquote", v]) = eval v
+        evalQuasi n (List ee@[Symbol "quasiquote", _]) = List <$> evalQuasi (n+1) `mapM` ee
+        evalQuasi n (List ee@[Symbol "unquote", _]) = List <$> evalQuasi (n-1) `mapM` ee
+        evalQuasi n (List xx) = List <$> mapM (evalQuasi n) xx
+        evalQuasi n (DottedList xx y) = DottedList <$> mapM (evalQuasi n) xx <*> evalQuasi n y
+        evalQuasi _ v = return v
 
     -- Why comment these out? Because `if` can be defined as a macro!
     -- -- if-then
@@ -120,44 +126,68 @@ eval expr@(List lst) = evalList $ map flattenList lst where
 
     -- cond
     -- TODO: Handle `cond` here. Use pattern matching to match the syntax
+    evalList [Symbol "cond", List (exps)] | length exps >= 1 = unimplemented "cond"
+
 
     -- let
     -- TODO: Handle `let` here. Use pattern matching to match the syntax
+    evalList [Symbol "let", List (exps), body] = --unimplemented "let"
+        do  val <- (\(k, v) -> modify $ H.insert k v) <$> mapM getBinding exps
+            res <- eval body
+            return res
 
     -- let*
     -- TODO: Handle `let*` here. Use pattern matching to match the syntax
+    evalList [Symbol "let", List (x:xs), List (e:es), body] = unimplemented "let*"
 
     -- lambda
     -- TODO: Handle `lambda` here. Use pattern matching to match the syntax
+    evalList [Symbol "lambda", List (params), body] = --unimplemented "lambda"
+        do  env <- get
+            val <- (\argVal -> Func argVal body env) <$> mapM getSym params
+            return $ (Func (map show params) body env)
+            -- return val
 
     -- define function
     evalList [Symbol "define", List (Symbol fname : args), body] =
-      do env <- get
-         val <- (\argVal -> Func argVal body env) <$> mapM getSym args
-         modify $ H.insert fname val
-         return Void
+        do  env <- get
+            val <- (\argVal -> Func argVal body env) <$> mapM getSym args
+            modify $ H.insert fname val
+            return Void
 
     -- define variable
     -- TODO: Handle `define` for variables here. Use pattern matching
     -- to match the syntax
+    evalList [Symbol "define", Symbol var, body] =
+        do  env <- get
+            val <- eval body
+            modify $ H.insert var val
+            return Void
+
 
     -- define-macro
     -- TODO: Handle `define-macro` here. Use pattern matching to match
     -- the syntax
+    evalList [Symbol "define-macro", List (Symbol fname : args), body] = undefined
+    --     do  --env <- get
+    --         val <- eval body
+    --         modify $ H.insert var val
+    --         return Void
 
     -- invalid use of keyword, throw a diagnostic
     evalList (Symbol sym : _) | elem sym keywords = invalidSpecialForm sym
 
     -- application
     evalList (fexpr:args) = eval fexpr >>= aux where
-      -- Macro expansion
-      -- TODO: implement macro evaluation
-      -- Use do-notation!
-      aux (Macro fmls body) | length fmls == length args = unimplemented "Macro expansion"
-      -- Function application
-      -- TODO: evaluate arguments, and feed `f` along with the evaluated
-      -- arguments to `apply`
-      aux f = unimplemented "Function application"
+        -- Macro expansion
+        -- TODO: implement macro evaluation
+        -- Use do-notation!
+        aux (Macro fmls body) | length fmls == length args = unimplemented "Macro expansion"
+
+        -- Function application
+        -- TODO: evaluate arguments, and feed `f` along with the evaluated
+        -- arguments to `apply`
+        aux f = unimplemented "Function application"
 
 eval val = throwError $ InvalidExpression val
 
@@ -167,11 +197,14 @@ apply :: Val -> [Val] -> EvalState Val
 -- TODO: implement function application
 -- Use do-notation!
 apply (Func fmls body cenv) args | length fmls == length args = unimplemented "`apply` on functions"
+    -- do  t_env <- get
+        -- modify $ H.insert
+
 -- Primitive
 -- TODO: implement primitive function application
 -- Since a primitive function has type `[Val] -> EvalState Val`, all you
 -- need is to apply it to arguments
-apply (PrimFunc p) args = unimplemented "`apply` on primitive functions"
+apply (PrimFunc p) args = p args
 -- Other values are not applicable
 -- TODO: you should simply throw a diagnostic
-apply f args = unimplemented "`apply` on invalid values"
+apply f args = throwError $ CannotApply f args

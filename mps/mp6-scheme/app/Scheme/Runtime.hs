@@ -38,7 +38,7 @@ liftBoolVargOp f = PrimFunc $ return . Boolean . f . map lowerBool
 
 -- TODO
 liftIntBinOp :: (Int -> Int -> Int) -> Val
-liftIntBinOp _ =
+liftIntBinOp f = --return f
   -- You should replace the following line with your own implementation
   PrimFunc . const $ unimplemented "Lifting binary integer operator (`liftIntBinOp`)"
 
@@ -55,7 +55,7 @@ liftBoolUnaryOp f = PrimFunc p where
 
 -- TODO
 liftCompOp :: (Int -> Int -> Bool) -> Val
-liftCompOp _ =
+liftCompOp comp = --return comp
   -- You should replace the following line with your own implementation
   PrimFunc . const $ unimplemented "Lifting comparison operator (`liftCompOp`)"
 
@@ -64,18 +64,20 @@ liftCompOp _ =
 -- Primitive function `car`
 -- TODO
 car :: [Val] -> EvalState Val
-car = const $ unimplemented "Primitive function `car`"
+-- car = const $ unimplemented "Primitive function `car`"
+car (xx)  = return $ head xx
 
 -- Primitive function `cdr`
 -- TODO
 cdr :: [Val] -> EvalState Val
 cdr = const $ unimplemented "Primitive function `cdr`"
+-- cdr (xx)  = return $ tail xx
 
 -- Primitive function `cons`
 -- TODO
 cons :: [Val] -> EvalState Val
-cons = const $ unimplemented "Primitive function `cons`"
-
+cons (x:y) = --const $ unimplemented "Primitive function `cons`"
+    return $ DottedList y x
 -- Primitive function `append`
 append :: [Val] -> EvalState Val
 append [] = return $ List []
@@ -103,7 +105,10 @@ applyPrim = const $ unimplemented "Primitive function `apply`"
 -- Examples:
 --   (eval '(+ 1 2 3))  => 6
 evalPrim :: [Val] -> EvalState Val
-evalPrim = const $ unimplemented "Primitive function `eval`"
+evalPrim args   =
+    -- const $ unimplemented "Primitive function `eval`"
+    case length args of
+        _ -> undefined
 
 -- Primitive function `=`, throwing type error for mismatch
 -- `=` is a comparison operator for numbers and booleans
@@ -170,11 +175,22 @@ isNull = const $ unimplemented "Primitive function `null?`"
 runtime :: Env
 runtime = H.fromList [ ("+", liftIntVargOp (+) 0)
                      , ("-", liftIntVargOp (-) 0)
+                     , ("*", liftIntVargOp (*) 1)
+                     , ("/", liftIntVargOp (div) 1)
                      , ("and", liftBoolVargOp and)
                      , ("or", liftBoolVargOp or)
                      , ("cons", PrimFunc cons)
                      , ("append", PrimFunc append)
-                     , ("symbol?", PrimFunc isSymbol)
+                     , ("car", PrimFunc car)
+                     , ("cdr", PrimFunc cdr)
+                     , ("eval", PrimFunc evalPrim)
+                    --  , ("`=`", PrimFunc equalSign)
+                     , ("eq?", PrimFunc eq)
                      , ("list?", PrimFunc isList)
+                     , ("symbol?", PrimFunc isSymbol)
+                     , ("pair?", PrimFunc isPair)
+                     , ("number?", PrimFunc isNumber)
+                     , ("boolean?", PrimFunc isBoolean)
+                     , ("null?", PrimFunc isNull)
                      -- TODO: Insert more runtime bindings here
                      ]
