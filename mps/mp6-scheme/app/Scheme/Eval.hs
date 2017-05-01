@@ -184,11 +184,17 @@ eval expr@(List lst) = evalList $ map flattenList lst where
         -- TODO: implement macro evaluation
         -- Use do-notation!
         aux (Macro fmls body) | length fmls == length args = unimplemented "Macro expansion"
+            -- do  old_env <- get
+            --     fmap (\(k,v) -> modify $ H.insert k v) (zip args fmls)
+            --     res <- eval fmls
+            --     return $ eval res
 
         -- Function application
         -- TODO: evaluate arguments, and feed `f` along with the evaluated
         -- arguments to `apply`
-        aux f = unimplemented "Function application"
+        aux f = unimplemented "app"
+            -- do  env <- get
+                -- return $ apply (Func (map (\v -> show $ eval v) args) f env) args
 
 eval val = throwError $ InvalidExpression val
 
