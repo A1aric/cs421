@@ -132,14 +132,15 @@ eval expr@(List lst) = evalList $ map flattenList lst where
     -- let
     -- TODO: Handle `let` here. Use pattern matching to match the syntax
     evalList [Symbol "let", List (exps), body] = --unimplemented "let"
-        do  let temp = mapM getBinding exps
-            val     <- fmap (\(k, v) -> modify $ H.insert k v) temp
+        do  let temp = H.empty
+            val     <- (\[(k, v)] -> H.insert k v temp) <$> mapM getBinding exps
+            modify $ H.union temp
             res     <- eval body
             return res
 
     -- let*
     -- TODO: Handle `let*` here. Use pattern matching to match the syntax
-    evalList [Symbol "let", List (x:xs), List (e:es), body] = unimplemented "let*"
+    evalList [Symbol "let*", List (x:xs), List (e:es), body] = unimplemented "let*"
 
     -- lambda
     -- TODO: Handle `lambda` here. Use pattern matching to match the syntax
@@ -192,9 +193,9 @@ eval expr@(List lst) = evalList $ map flattenList lst where
         -- Function application
         -- TODO: evaluate arguments, and feed `f` along with the evaluated
         -- arguments to `apply`
-        aux f = unimplemented "app"
-            -- do  env <- get
-                -- return $ apply (Func (map (\v -> show $ eval v) args) f env) args
+        aux f = --unimplemented "app"
+            do  env <- get
+                apply f (args)
 
 eval val = throwError $ InvalidExpression val
 
@@ -203,9 +204,15 @@ apply :: Val -> [Val] -> EvalState Val
 -- Function
 -- TODO: implement function application
 -- Use do-notation!
-apply (Func fmls body cenv) args | length fmls == length args = unimplemented "`apply` on functions"
-    -- do  t_env <- get
-        -- modify $ H.insert
+apply (Func fmls body cenv) args | length fmls == length args = --unimplemented "`apply` on functions"
+    do  t_env <- get
+        put cenv -- modify $ H.union cenv
+        let temp_list = zip fmls args
+        modify $ H.union (H.fromList temp_list)
+        -- map (\(k,v) -> modify $ H.union k v) temp_list
+        res <- eval body
+        put t_env
+        return res
 
 -- Primitive
 -- TODO: implement primitive function application

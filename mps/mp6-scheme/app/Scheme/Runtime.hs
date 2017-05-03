@@ -38,7 +38,7 @@ liftBoolVargOp f = PrimFunc $ return . Boolean . f . map lowerBool
 
 -- TODO
 liftIntBinOp :: (Int -> Int -> Int) -> Val
-liftIntBinOp f = --return f
+liftIntBinOp f = -- $ Number . f lowerInt
   -- You should replace the following line with your own implementation
   PrimFunc . const $ unimplemented "Lifting binary integer operator (`liftIntBinOp`)"
 
@@ -78,15 +78,16 @@ cdr = const $ unimplemented "Primitive function `cdr`"
 cons :: [Val] -> EvalState Val
 cons (x:y) = --const $ unimplemented "Primitive function `cons`"
     return $ DottedList y x
+
 -- Primitive function `append`
 append :: [Val] -> EvalState Val
 append [] = return $ List []
 append [x] = return x
 append vv = foldlM append' (List []) (map flattenList vv) where
-  append' (List []) x = return x
-  append' (List xs) (List ys) = return $ List (xs ++ ys)
-  append' (List xs) (DottedList ys y) = return $ DottedList (xs ++ ys) y
-  append' _ acc = throwError $ TypeError acc
+    append' (List []) x = return x
+    append' (List xs) (List ys) = return $ List (xs ++ ys)
+    append' (List xs) (DottedList ys y) = return $ DottedList (xs ++ ys) y
+    append' _ acc = throwError $ TypeError acc
 
 -- Primitive function `apply`
 -- It applies a function to a list of parameters
@@ -95,7 +96,10 @@ append vv = foldlM append' (List []) (map flattenList vv) where
 --   (apply + '(1 2 3))  => 6
 --   (apply car '((1 2 3)))  => 1
 applyPrim :: [Val] -> EvalState Val
-applyPrim = const $ unimplemented "Primitive function `apply`"
+applyPrim ((PrimFunc f):args)   =
+    f =<< (mapM eval args)
+applyPrim (f:args)              =
+    throwError $ CannotApply f args
 
 -- Primitive function `eval`
 -- It evaluates the single argument as an expression
@@ -105,10 +109,9 @@ applyPrim = const $ unimplemented "Primitive function `apply`"
 -- Examples:
 --   (eval '(+ 1 2 3))  => 6
 evalPrim :: [Val] -> EvalState Val
-evalPrim args   =
+evalPrim [x] = eval =<< eval x
+evalPrim ayy  = throwError $ CannotApply (PrimFunc evalPrim) ayy
     -- const $ unimplemented "Primitive function `eval`"
-    case length args of
-        _ -> undefined
 
 -- Primitive function `=`, throwing type error for mismatch
 -- `=` is a comparison operator for numbers and booleans
@@ -168,8 +171,10 @@ isBoolean = const $ unimplemented "Primitive function `boolean?`"
 -- Note: Think about what's equivalent
 -- TODO
 isNull :: [Val] -> EvalState Val
-isNull = const $ unimplemented "Primitive function `null?`"
-
+isNull = -- if x == ()
+            -- then return (Boolean True)
+            -- else return (Boolean False)
+            const $ unimplemented "Primitive function `null?`"
 --- ### Runtime
 
 runtime :: Env
@@ -179,12 +184,14 @@ runtime = H.fromList [ ("+", liftIntVargOp (+) 0)
                      , ("/", liftIntVargOp (div) 1)
                      , ("and", liftBoolVargOp and)
                      , ("or", liftBoolVargOp or)
+                    --  , ("liftIntBinOp", liftIntBinOp )
                      , ("cons", PrimFunc cons)
                      , ("append", PrimFunc append)
                      , ("car", PrimFunc car)
                      , ("cdr", PrimFunc cdr)
                      , ("eval", PrimFunc evalPrim)
-                    --  , ("`=`", PrimFunc equalSign)
+                     , ("apply", PrimFunc applyPrim)
+                     , ("=", PrimFunc equalSign)
                      , ("eq?", PrimFunc eq)
                      , ("list?", PrimFunc isList)
                      , ("symbol?", PrimFunc isSymbol)
