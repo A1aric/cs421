@@ -1,6 +1,6 @@
 Grade report for Sujay Patwardhan
 Programming Languages (cs421) 2017-01
-Report generated 2017-05-03 19:31:06
+Report generated 2017-05-04 10:38:33
 
 
 Factors are {16: 0.0, 11: 4.0, 12: 2.0, 13: 8.0, 14: 8.0, 15: 6.0}
@@ -20,7 +20,7 @@ First and Follow Sets - Exam 2  Graded     10 /  10 100.0    3.33   3.33
           LL Grammars - Exam 2 Pending      0 /  20   0.0    0.00   0.00
           LR Grammars - Exam 2  Graded      5 /  10  50.0    3.33   1.67
             Monotypes - Exam 2  Graded     10 /  20  50.0    3.33   1.67
-          Unification - Exam 2  Graded     10 /  10 100.0    3.33   3.33
+          Unification - Exam 2  Graded     10 /  20  50.0    3.33   1.67
                 Haskell - MP 1  Graded    100 / 100 100.0    3.75   3.75
             Interpreter - MP 2  Graded    100 / 100 100.0    3.75   3.75
                     CPS - MP 3  Graded    100 / 100 100.0    3.75   3.75
@@ -29,8 +29,8 @@ First and Follow Sets - Exam 2  Graded     10 /  10 100.0    3.33   3.33
                  Scheme - MP 6 Pending      0 / 100   0.0    0.00   0.00
         Type Inferencer - MP 7 Pending      0 / 100   0.0    0.00   0.00
             Interpreter - ML 2  Graded    100 / 100 100.0    7.50   7.50
-                    CPS - ML 3 Dropped    100 / 100 100.0    0.00   0.00
-                  Forth - ML 4  Graded    100 / 100 100.0    7.50   7.50
+                    CPS - ML 3  Graded    100 / 100 100.0    7.50   7.50
+                  Forth - ML 4 Dropped    100 / 100 100.0    0.00   0.00
                  Scheme - ML 5 Pending      0 / 100   0.0    0.00   0.00
                Gitlab Activity  Graded      1 /   1 100.0    0.62   0.62
             Recursion Activity  Graded      2 /   2 100.0    0.62   0.62
@@ -43,15 +43,15 @@ First and Follow Sets - Exam 2  Graded     10 /  10 100.0    3.33   3.33
 
 
 
-Earned points so far:  66.06
+Earned points so far:  64.40
 Graded points so far:  75.00
-       Current score: 88.08%
-        Max possible: 91.06%
+       Current score: 85.86%
+        Max possible: 89.40%
 
  (Max possible does not take grade replacement from final into account.)
 If you believe there is an error that only affects you, please open an issue on your gitlab account.
 If you believe there is an error likely to be systemic, post a note on Piazza.
 
 Notes:
-CPS - ML 3 was dropped.  Its score was 100.0%.
+Forth - ML 4 was dropped.  Its score was 100.0%.
 
