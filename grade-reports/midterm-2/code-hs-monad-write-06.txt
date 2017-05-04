@@ -1,0 +1,35 @@
+Problem grade report.
+Problem slug: code-hs-monad-write-06
+Netid: ptwrdhn2
+
+Your Submission:
+
+----------------------------------------
+data List a = Cons a (List a)
+            | Empty
+            deriving Show
+
+instance Functor List where
+  fmap _ Empty       = Empty
+  fmap f (Cons x xs) = Cons (f x) (fmap f xs)
+
+instance Applicative List where
+  pure x = Cons x Empty
+
+  fs <*> xs =
+    let toList Empty = []
+        toList (Cons x xs) = x:(toList xs)
+        fromList [] = Empty
+        fromList (x:xs) = Cons x (fromList xs)
+    in fromList [f x | x <- toList xs, f <- toList fs]
+
+instance Monad List where
+    return              a = Cons a Empty
+    (>>=) Empty         f = Empty
+    (>>=) (Cons x xs)   f = fmap f (Cons x xs)
+----------------------------------------
+
+Grading and comments
+Max score: 10
+The bind for non-empty lists has doubly nested monads (-3)
+Final score: 7
