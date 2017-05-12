@@ -188,14 +188,16 @@ eval expr@(List lst) = evalList $ map flattenList lst where
             -- do  old_env <- get
             --     fmap (\(k,v) -> modify $ H.insert k v) (zip args fmls)
             --     res <- eval fmls
+            --     put old_env
             --     return $ eval res
 
         -- Function application
         -- TODO: evaluate arguments, and feed `f` along with the evaluated
         -- arguments to `apply`
-        aux f = --unimplemented "app"
+        aux f =
             do  env <- get
-                apply f (args)
+                eval_args <- mapM eval args
+                apply f (eval_args)
 
 eval val = throwError $ InvalidExpression val
 
@@ -204,7 +206,7 @@ apply :: Val -> [Val] -> EvalState Val
 -- Function
 -- TODO: implement function application
 -- Use do-notation!
-apply (Func fmls body cenv) args | length fmls == length args = --unimplemented "`apply` on functions"
+apply (Func fmls body cenv) args | length fmls == length args =
     do  t_env <- get
         put cenv -- modify $ H.union cenv
         let temp_list = zip fmls args
