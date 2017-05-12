@@ -1,9 +1,9 @@
 Grade report for Sujay Patwardhan
 Programming Languages (cs421) 2017-01
-Report generated 2017-05-04 12:53:07
+Report generated 2017-05-12 16:43:21
 
 
-Factors are {16: 0.0, 11: 4.0, 12: 2.0, 13: 8.0, 14: 8.0, 15: 7.0}
+Factors are {16: 0.0, 11: 5.0, 12: 2.0, 13: 8.0, 14: 8.0, 15: 7.0}
                     Assignment  Status Points / Max  Norm Weight% Points
 ------------------------------------------------------------------------
             Recursion - Exam 1  Graded     10 /  10 100.0    2.50   2.50
@@ -21,11 +21,11 @@ First and Follow Sets - Exam 2  Graded     10 /  10 100.0    2.86   2.86
           LR Grammars - Exam 2  Graded      5 /  10  50.0    2.86   1.43
             Monotypes - Exam 2  Graded     20 /  20 100.0    2.86   2.86
           Unification - Exam 2  Graded     10 /  20  50.0    2.86   1.43
-                Haskell - MP 1  Graded    100 / 100 100.0    3.75   3.75
-            Interpreter - MP 2  Graded    100 / 100 100.0    3.75   3.75
-                    CPS - MP 3  Graded    100 / 100 100.0    3.75   3.75
-                  Forth - MP 4  Graded    100 / 100 100.0    3.75   3.75
-                Parsing - MP 5 Pending      0 / 100   0.0    0.00   0.00
+                Haskell - MP 1  Graded    100 / 100 100.0    3.00   3.00
+            Interpreter - MP 2  Graded    100 / 100 100.0    3.00   3.00
+                    CPS - MP 3  Graded    100 / 100 100.0    3.00   3.00
+                  Forth - MP 4  Graded    100 / 100 100.0    3.00   3.00
+                Parsing - MP 5  Graded    100 / 100 100.0    3.00   3.00
                  Scheme - MP 6 Pending      0 / 100   0.0    0.00   0.00
         Type Inferencer - MP 7 Pending      0 / 100   0.0    0.00   0.00
             Interpreter - ML 2  Graded    100 / 100 100.0    7.50   7.50
