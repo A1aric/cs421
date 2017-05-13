@@ -96,14 +96,9 @@ eval expr@(List lst) = evalList $ map flattenList lst where
     evalList [] = throwError $ InvalidExpression expr
 
     -- quote
-    -- TODO
-    evalList [Symbol "quote", e] = --unimplemented "Special form `quote`"
-        return e
+    evalList [Symbol "quote", e] = return e
     -- unquote (illegal at surface evaluation)
-    -- TODO: since surface-level `unquote` is illegal, all you need to do is
-    -- to throw a diagnostic
-    evalList [Symbol "unquote", e] = --unimplemented "Special form `unquote`"
-        throwError $ UnquoteNotInQuasiquote e
+    evalList [Symbol "unquote", e] = throwError $ UnquoteNotInQuasiquote e
 
     -- quasiquote
     evalList [Symbol "quasiquote", e] = evalQuasi 1 e where
@@ -153,8 +148,15 @@ eval expr@(List lst) = evalList $ map flattenList lst where
             return res
 
     -- let*
-    -- TODO: Handle `let*` here. Use pattern matching to match the syntax
-    evalList [Symbol "let*", List (x:xs), List (e:es), body] = unimplemented "let*"
+    -- evalList [Symbol "let*", List([]), body] = eval body
+    evalList [Symbol "let*", List([]), body] = eval body
+    evalList [Symbol "let*", List(x:xs), body] = do
+        envOrig <- get
+        tupes <- mapM getBinding [x]
+        modify (H.union (H.fromList tupes))
+        res <- evalList [Symbol "let*", List(xs), body]
+        put envOrig
+        return res
 
     -- lambda
     -- TODO: Handle `lambda` here. Use pattern matching to match the syntax

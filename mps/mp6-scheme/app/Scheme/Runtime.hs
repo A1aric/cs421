@@ -75,23 +75,34 @@ myFold f z (x:y:xs) = (f x y) && (myFold f z xs)
 
 --- ### Primtive operations
 
--- Primitive function `car`
--- TODO
-car :: [Val] -> EvalState Val
--- car = const $ unimplemented "Primitive function `car`"
-car xs = return $ flattenList (head xs)
+--worked with ymostofi
 
+-- Primitive function `car`
+car :: [Val] -> EvalState Val
+car xx = if length xx == 1
+    then case (flattenList (head xx)) of
+        List x -> return $ head x
+        DottedList (a:as) sa -> return a
+        otherwise -> throwError $ UnexpectedArgs xx
+    else throwError $ UnexpectedArgs xx
 -- Primitive function `cdr`
--- TODO
 cdr :: [Val] -> EvalState Val
-cdr = const $ unimplemented "Primitive function `cdr`"
--- cdr ((List x):xs) = return $ flattenList (tail xs)
+-- cdr = const $ unimplemented "Primitive function `cdr`"
+cdr xx = if length xx == 1
+    then case (flattenList (List (tail xx))) of
+        List x -> return $ List (tail x)
+        DottedList (a:as) sa -> return a
+        otherwise -> throwError $ UnexpectedArgs xx
+    else throwError $ UnexpectedArgs xx
 
 -- Primitive function `cons`
--- TODO
 cons :: [Val] -> EvalState Val
-cons (x:y) = --const $ unimplemented "Primitive function `cons`"
-    return $ DottedList y x
+cons xx = if length xx == 2
+  then return $ (DottedList [(head xx)] (head $ tail xx))
+  else throwError $ UnexpectedArgs xx
+
+list :: [Val] -> EvalState Val
+list xx = return $ List xx
 
 -- Primitive function `append`
 append :: [Val] -> EvalState Val
@@ -105,7 +116,6 @@ append vv = foldlM append' (List []) (map flattenList vv) where
 
 -- Primitive function `apply`
 -- It applies a function to a list of parameters
--- TODO
 -- Examples:
 --   (apply + '(1 2 3))  => 6
 --   (apply car '((1 2 3)))  => 1
@@ -134,9 +144,15 @@ evalPrim xx | length xx == 1 = eval $ head xx
 --   (= 'a 10) => Type error
 --   (= 'a 'b) => Type error
 equalSign :: [Val] -> EvalState Val
-equalSign = const $ unimplemented "Primitive function `=`" --throwError $ TypeError []
--- equalSign [x] = return $ Boolean True
--- equalSign xx = Boolean . foldr (==) True xx
+equalSign [] = return $ Boolean True
+equalSign [x] = return $ Boolean True
+equalSign (x:xs) = aux_s xs x True
+
+aux_s []              (Number i) b = return $ Boolean b
+aux_s ((Number x):xs) (Number i) b = aux_s xs (Number i) (b && (x == i))
+aux_s []              (Boolean i) b = return $ Boolean b
+aux_s ((Boolean x):xs) (Boolean i) b = aux_s xs (Boolean i) (b && (x == i))
+aux_s (x:xs) _ _ = throwError $ TypeError x
 
 -- Primitive function `eq?`, not throwing any error
 -- `eq?` is a comparison operator for atom values (numbers, booleans, and symbols)
@@ -149,14 +165,23 @@ equalSign = const $ unimplemented "Primitive function `=`" --throwError $ TypeEr
 --   (eq? 'a 10) => #f
 --   (eq? 'a 'a) => #t
 eq :: [Val] -> EvalState Val
-eq = const $ unimplemented "Primitive function `eq?`" --return $ Boolean False
--- eq [x] = return $ Boolean True
--- eq xx = Boolean . foldr (==) True xx
+eq [] = return $ Boolean True
+eq [x] = return $ Boolean True
+eq (x:xs) = aux xs x True
+
+aux []              (Number i) b = return $ Boolean b
+aux ((Number x):xs) (Number i) b = aux xs (Number i) (b && (x == i))
+aux []              (Boolean i) b = return $ Boolean b
+aux ((Boolean x):xs) (Boolean i) b = aux xs (Boolean i) (b && (x == i))
+aux []              (Symbol i) b = return $ Boolean b
+aux ((Symbol x):xs) (Symbol i) b = aux xs (Symbol i) (b && (x == i))
+aux (x:xs) _ _ = return $ Boolean False
+
+
 
 -- Primitive function `list?` predicate
 -- `(list? arg)` determines whether `arg` is a non-dotted list
 -- or an empty list (null)
--- TODO
 isList :: [Val] -> EvalState Val
 isList [v] = return . Boolean $ case flattenList v of
                     List _ -> True
@@ -164,7 +189,6 @@ isList [v] = return . Boolean $ case flattenList v of
 isList vv = throwError $ UnexpectedArgs vv
 
 -- Primitive function `symbol?` predicate
--- TODO
 isSymbol :: [Val] -> EvalState Val
 isSymbol [Symbol _] = return $ Boolean True
 isSymbol [_] = return $ Boolean False
@@ -172,29 +196,36 @@ isSymbol vv = throwError $ UnexpectedArgs vv
 
 -- Primitive function `pair?` predicate
 -- Any `List` or `DottedList` is a pair
--- TODO
 isPair :: [Val] -> EvalState Val
-isPair = const $ unimplemented "Primitive function `pair?`"
+isPair [x] = return . Boolean $ case flattenList x of
+  List x -> not (length x == 0)
+  DottedList ys y -> True
+  _ -> False
+isPair xx = throwError $ UnexpectedArgs xx
 
 -- Primitive function `number?` predicate
 -- TODO
 isNumber :: [Val] -> EvalState Val
-isNumber = const $ unimplemented "Primitive function `number?`"
+isNumber [Number _] = return $ Boolean True
+isNumber [_] = return $ Boolean False
+isNumber vv = throwError $ UnexpectedArgs vv
 
 -- Primitive function `boolean?` predicate
--- TODO
 isBoolean :: [Val] -> EvalState Val
-isBoolean = const $ unimplemented "Primitive function `boolean?`"
+isBoolean [Boolean _] = return $ Boolean True
+isBoolean [_] = return $ Boolean False
+isBoolean vv = throwError $ UnexpectedArgs vv
+    --const $ unimplemented "Primitive function `boolean?`"
 
 -- Primitive function `null?` predicate
 -- An empty list or its *equivalent* value is null
 -- Note: Think about what's equivalent
 -- TODO
 isNull :: [Val] -> EvalState Val
-isNull = -- if x == ()
-            -- then return (Boolean True)
-            -- else return (Boolean False)
-            const $ unimplemented "Primitive function `null?`"
+isNull [x] =  return . Boolean $ case flattenList x of
+                            List x -> (length x == 0)
+                            _      -> False
+isNull vv = throwError $ UnexpectedArgs vv
 --- ### Runtime
 
 runtime :: Env
@@ -211,10 +242,11 @@ runtime = H.fromList [ ("+", liftIntVargOp (+) 0)
                      , ("<", liftCompOp (<))
                      , (">=", liftCompOp (>=))
                      , ("<=", liftCompOp (<=))
-                    --  , ("=", equalSign (=))
+                     , ("!=", liftCompOp (/=))
                      , ("cons", PrimFunc cons)
                      , ("append", PrimFunc append)
                      , ("car", PrimFunc car)
+                     , ("list", PrimFunc list)
                      , ("cdr", PrimFunc cdr)
                      , ("eval", PrimFunc evalPrim)
                      , ("apply", PrimFunc applyPrim)
