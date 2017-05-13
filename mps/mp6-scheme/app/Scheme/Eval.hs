@@ -174,18 +174,16 @@ eval expr@(List lst) = evalList $ map flattenList lst where
     -- define variable
     -- TODO: Handle `define` for variables here. Use pattern matching
     -- to match the syntax
-    evalList [Symbol "define", Symbol var, body] =
+    evalList [Symbol "define", (Symbol var), body] =
         do  env <- get
             val <- eval body
             modify $ H.insert var val
             return Void
-
-
     -- define-macro
     -- TODO: Handle `define-macro` here. Use pattern matching to match
     -- the syntax
     evalList [Symbol "define-macro", List (Symbol fname : args), body] =
-        do  val <- (\temp -> (Macro temp body)) <$> mapM getSym args
+        do  val <- (\temp -> Macro temp body) <$> mapM getSym args
             modify $ H.insert fname val
             return Void
 
@@ -222,10 +220,9 @@ apply :: Val -> [Val] -> EvalState Val
 -- Use do-notation!
 apply (Func fmls body cenv) args | length fmls == length args =
     do  t_env <- get
-        put cenv -- modify $ H.union cenv
+        modify $ H.union cenv
         let temp_list = zip fmls args
         modify $ H.union (H.fromList temp_list)
-        -- map (\(k,v) -> modify $ H.union k v) temp_list
         res <- eval body
         put t_env
         return res

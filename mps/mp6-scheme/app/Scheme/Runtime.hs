@@ -38,11 +38,11 @@ liftBoolVargOp f = PrimFunc $ return . Boolean . f . map lowerBool
 
 -- TODO
 liftIntBinOp :: (Int -> Int -> Int) -> Val
-liftIntBinOp f = --PrimFunc p where
-    -- p [x,y] = return $ Number (f x y)
-    -- p xx    = throwError $ UnexpectedArgs xx
+liftIntBinOp f = PrimFunc p where
+    p [(Number x),(Number y)] = return $ Number (f x y)
+    p xx    = throwError $ UnexpectedArgs xx
     -- You should replace the following line with your own implementation
-    PrimFunc . const $ unimplemented "Lifting binary integer operator (`liftIntBinOp`)"
+    -- PrimFunc . const $ unimplemented "Lifting binary integer operator (`liftIntBinOp`)"
 
 
 liftIntUnaryOp :: (Int -> Int) -> Val
@@ -110,10 +110,8 @@ append vv = foldlM append' (List []) (map flattenList vv) where
 --   (apply + '(1 2 3))  => 6
 --   (apply car '((1 2 3)))  => 1
 applyPrim :: [Val] -> EvalState Val
-applyPrim ((PrimFunc f):args)   =
-    f =<< (mapM eval args)
-applyPrim (f:args)              =
-    throwError $ CannotApply f args
+applyPrim [f, List args] = apply f args
+applyPrim v              = throwError $ UnexpectedArgs v
 
 -- Primitive function `eval`
 -- It evaluates the single argument as an expression
@@ -123,9 +121,8 @@ applyPrim (f:args)              =
 -- Examples:
 --   (eval '(+ 1 2 3))  => 6
 evalPrim :: [Val] -> EvalState Val
-evalPrim [x] = eval =<< eval x
-evalPrim ayy  = throwError $ CannotApply (PrimFunc evalPrim) ayy
-    -- const $ unimplemented "Primitive function `eval`"
+evalPrim xx | length xx == 1 = eval $ head xx
+            | otherwise = throwError $ UnexpectedArgs xx
 
 -- Primitive function `=`, throwing type error for mismatch
 -- `=` is a comparison operator for numbers and booleans
@@ -137,8 +134,9 @@ evalPrim ayy  = throwError $ CannotApply (PrimFunc evalPrim) ayy
 --   (= 'a 10) => Type error
 --   (= 'a 'b) => Type error
 equalSign :: [Val] -> EvalState Val
-equalSign = const $ unimplemented "Primitive function `=`"
-
+equalSign = const $ unimplemented "Primitive function `=`" --throwError $ TypeError []
+-- equalSign [x] = return $ Boolean True
+-- equalSign xx = Boolean . foldr (==) True xx
 
 -- Primitive function `eq?`, not throwing any error
 -- `eq?` is a comparison operator for atom values (numbers, booleans, and symbols)
@@ -151,19 +149,26 @@ equalSign = const $ unimplemented "Primitive function `=`"
 --   (eq? 'a 10) => #f
 --   (eq? 'a 'a) => #t
 eq :: [Val] -> EvalState Val
-eq = const $ unimplemented "Primitive function `eq?`"
+eq = const $ unimplemented "Primitive function `eq?`" --return $ Boolean False
+-- eq [x] = return $ Boolean True
+-- eq xx = Boolean . foldr (==) True xx
 
 -- Primitive function `list?` predicate
 -- `(list? arg)` determines whether `arg` is a non-dotted list
 -- or an empty list (null)
 -- TODO
 isList :: [Val] -> EvalState Val
-isList = const $ unimplemented "Primitive function `list?`"
+isList [v] = return . Boolean $ case flattenList v of
+                    List _ -> True
+                    _ -> False
+isList vv = throwError $ UnexpectedArgs vv
 
 -- Primitive function `symbol?` predicate
 -- TODO
 isSymbol :: [Val] -> EvalState Val
-isSymbol = const $ unimplemented "Primitive function `symbol?`"
+isSymbol [Symbol _] = return $ Boolean True
+isSymbol [_] = return $ Boolean False
+isSymbol vv = throwError $ UnexpectedArgs vv
 
 -- Primitive function `pair?` predicate
 -- Any `List` or `DottedList` is a pair
@@ -221,5 +226,4 @@ runtime = H.fromList [ ("+", liftIntVargOp (+) 0)
                      , ("number?", PrimFunc isNumber)
                      , ("boolean?", PrimFunc isBoolean)
                      , ("null?", PrimFunc isNull)
-                     -- TODO: Insert more runtime bindings here
                      ]
