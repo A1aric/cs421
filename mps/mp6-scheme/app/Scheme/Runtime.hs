@@ -29,35 +29,49 @@ lowerList v = throwError $ TypeError v
 
 liftIntVargOp :: (Int -> Int -> Int) -> Int -> Val
 liftIntVargOp f c = PrimFunc p where
-  p [] = return $ Number c
-  p [x] = Number . f c <$> lowerInt x
-  p xx = Number . foldl1 f <$> mapM lowerInt xx
+    p [] = return $ Number c
+    p [x] = Number . f c <$> lowerInt x
+    p xx = Number . foldl1 f <$> mapM lowerInt xx
 
 liftBoolVargOp :: ([Bool] -> Bool) -> Val
 liftBoolVargOp f = PrimFunc $ return . Boolean . f . map lowerBool
 
 -- TODO
 liftIntBinOp :: (Int -> Int -> Int) -> Val
-liftIntBinOp f = -- $ Number . f lowerInt
-  -- You should replace the following line with your own implementation
-  PrimFunc . const $ unimplemented "Lifting binary integer operator (`liftIntBinOp`)"
+liftIntBinOp f = --PrimFunc p where
+    -- p [x,y] = return $ Number (f x y)
+    -- p xx    = throwError $ UnexpectedArgs xx
+    -- You should replace the following line with your own implementation
+    PrimFunc . const $ unimplemented "Lifting binary integer operator (`liftIntBinOp`)"
 
--- TODO
+
 liftIntUnaryOp :: (Int -> Int) -> Val
-liftIntUnaryOp _ =
+liftIntUnaryOp f = PrimFunc p where
+    p [Number x] = return $ Number $ f x
+    p v = throwError $ UnexpectedArgs v
   -- You should replace the following line with your own implementation
-  PrimFunc . const $ unimplemented "Lifting unary integer operator (`liftIntUnaryOp`)"
+  -- PrimFunc . const $ unimplemented "Lifting unary integer operator (`liftIntUnaryOp`)"
 
 liftBoolUnaryOp :: (Bool -> Bool) -> Val
 liftBoolUnaryOp f = PrimFunc p where
-  p [Boolean x] = return $ Boolean $ f x
-  p v = throwError $ UnexpectedArgs v
+    p [Boolean False] = return $ Boolean $ f False
+    p [_] = return $ Boolean $ f True
+    p v = throwError $ UnexpectedArgs v
 
--- TODO
+
 liftCompOp :: (Int -> Int -> Bool) -> Val
-liftCompOp comp = --return comp
+liftCompOp f = PrimFunc p where
+    p [] = return $ Boolean True
+    p [x] = return $ Boolean True
+    p xx = Boolean . myFold f True <$> mapM lowerInt xx
   -- You should replace the following line with your own implementation
-  PrimFunc . const $ unimplemented "Lifting comparison operator (`liftCompOp`)"
+  -- PrimFunc . const $ unimplemented "Lifting comparison operator (`liftCompOp`)"
+
+
+myFold :: (a -> a -> Bool) -> Bool -> [a] -> Bool
+myFold f z []       = z
+myFold f z [_]      = z
+myFold f z (x:y:xs) = (f x y) && (myFold f z xs)
 
 --- ### Primtive operations
 
@@ -65,13 +79,13 @@ liftCompOp comp = --return comp
 -- TODO
 car :: [Val] -> EvalState Val
 -- car = const $ unimplemented "Primitive function `car`"
-car (xx)  = return $ head xx
+car xs = return $ flattenList (head xs)
 
 -- Primitive function `cdr`
 -- TODO
 cdr :: [Val] -> EvalState Val
 cdr = const $ unimplemented "Primitive function `cdr`"
--- cdr (xx)  = return $ tail xx
+-- cdr ((List x):xs) = return $ flattenList (tail xs)
 
 -- Primitive function `cons`
 -- TODO
@@ -124,6 +138,7 @@ evalPrim ayy  = throwError $ CannotApply (PrimFunc evalPrim) ayy
 --   (= 'a 'b) => Type error
 equalSign :: [Val] -> EvalState Val
 equalSign = const $ unimplemented "Primitive function `=`"
+
 
 -- Primitive function `eq?`, not throwing any error
 -- `eq?` is a comparison operator for atom values (numbers, booleans, and symbols)
@@ -184,7 +199,14 @@ runtime = H.fromList [ ("+", liftIntVargOp (+) 0)
                      , ("/", liftIntVargOp (div) 1)
                      , ("and", liftBoolVargOp and)
                      , ("or", liftBoolVargOp or)
-                    --  , ("liftIntBinOp", liftIntBinOp )
+                     , ("not", liftBoolUnaryOp not)
+                     , ("abs", liftIntUnaryOp abs)
+                     , ("modulo", liftIntBinOp mod)
+                     , (">", liftCompOp (>))
+                     , ("<", liftCompOp (<))
+                     , (">=", liftCompOp (>=))
+                     , ("<=", liftCompOp (<=))
+                    --  , ("=", equalSign (=))
                      , ("cons", PrimFunc cons)
                      , ("append", PrimFunc append)
                      , ("car", PrimFunc car)

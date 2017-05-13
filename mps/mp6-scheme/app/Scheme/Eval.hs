@@ -126,16 +126,30 @@ eval expr@(List lst) = evalList $ map flattenList lst where
 
     -- cond
     -- TODO: Handle `cond` here. Use pattern matching to match the syntax
-    evalList [Symbol "cond", List (exps)] | length exps >= 1 = unimplemented "cond"
+    evalList [Symbol "cond", List ([cons, exprs])] =
+        do  (con, expr) <- getListOf2 (List ([cons, exprs]))
+            aux con expr where
+                aux (Symbol "else") e = eval e
+                aux blah            e = eval blah >>= \case
+                    Boolean False -> return Void
+                    otherwise     -> eval e
 
-
+    evalList ((Symbol "cond"):(List ([cons, exprs])):others) =
+        do  (con, expr) <- getListOf2 (List ([cons, exprs]))
+            aux con expr where
+                aux (Symbol "else") e = invalidSpecialForm "cond"
+                aux blah            e = eval blah >>= \case
+                    Boolean False -> evalList ((Symbol "cond"):others)
+                    otherwise     -> eval e
     -- let
     -- TODO: Handle `let` here. Use pattern matching to match the syntax
     evalList [Symbol "let", List (exps), body] = --unimplemented "let"
-        do  let temp = H.empty
-            val     <- (\[(k, v)] -> H.insert k v temp) <$> mapM getBinding exps
-            modify $ H.union temp
+        do  old_env <- get
+            let temp = H.empty
+            val     <- mapM getBinding exps
+            modify $ H.union (H.fromList val)
             res     <- eval body
+            put old_env
             return res
 
     -- let*
@@ -170,10 +184,9 @@ eval expr@(List lst) = evalList $ map flattenList lst where
     -- define-macro
     -- TODO: Handle `define-macro` here. Use pattern matching to match
     -- the syntax
-    evalList [Symbol "define-macro", List (Symbol fname : args), body] = -- unimplemented "define-macro"
-        do  -- env <- get
-            val <- eval body
-            modify $ H.insert fname (Macro (map show args) body)
+    evalList [Symbol "define-macro", List (Symbol fname : args), body] =
+        do  val <- (\temp -> (Macro temp body)) <$> mapM getSym args
+            modify $ H.insert fname val
             return Void
 
     -- invalid use of keyword, throw a diagnostic
@@ -184,12 +197,13 @@ eval expr@(List lst) = evalList $ map flattenList lst where
         -- Macro expansion
         -- TODO: implement macro evaluation
         -- Use do-notation!
-        aux (Macro fmls body) | length fmls == length args = unimplemented "Macro expansion"
-            -- do  old_env <- get
-            --     fmap (\(k,v) -> modify $ H.insert k v) (zip args fmls)
-            --     res <- eval fmls
-            --     put old_env
-            --     return $ eval res
+        aux (Macro fmls body) | length fmls == length args = --unimplemented "Macro expansion"
+            do  old_env <- get
+                let temp_list = zip fmls args
+                modify $ H.union (H.fromList temp_list)
+                res <- eval body
+                put old_env
+                eval res
 
         -- Function application
         -- TODO: evaluate arguments, and feed `f` along with the evaluated
