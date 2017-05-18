@@ -1,0 +1,34 @@
+Passed: 18.0
+Total: 100.0
+Score: 18.0
+
+## Test Output
+
+
+Running Tests
+=============
+Pass: Runtime: Arithmetic Operators
+Pass: Runtime: Boolean Operators
+Fail [False,False,False,False,False,False,False,False,False,False,False]: Runtime: Comparison Operators
+Fail [False,False,False,False,False,False,False,False,False,False,False,False,False,False]: Runtime: List Operations
+Fail [False,False,False,False,False,False,False,False,False,False]: Runtime: Unary Operators
+Fail [False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False]: Runtime: = and eq? Operators
+Fail [False,False,False,False,False,False]: Runtime: modulo
+Fail [False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False]: Runtime: dynamic types
+Fail [False,False,False,False,False,False,False,False,False,False]: Runtime: more runtime tests
+Pass: Evaluator: self-evaluating atoms
+Pass: Evaluator: value lookup
+Fail [True,True,False,False,False,False]: Evaluator: define special form
+Fail [True,False,True,True]: Evaluator: lambda form
+Fail [False,False,False]: Evaluator: simple HOF test
+Fail [False,True,True,False,False,False,False,False,False,False,False]: Evaluator: conds tests
+Fail [False,False,False,False,False]: Evaluator: let
+Fail [False,False,False,False]: Evaluator: let*
+Fail [True,True,True,True,True,False,False,False,False,True,False,True,True,True,True,True,False,False]: Evaluator: quote and eval
+Fail [False,False,False]: Evaluator: define-macro
+Fail [True,True,True,True,True,False,False,False,False,True,False,True,True,True,True,True,False,False]: Evaluator: quote, quasiquote, and eval
+Fail [False,False,False,False,False,False]: Evaluator: apply
+Fail [True,True,True,False,False]: Evaluator: eval
+
+Score: 18 / 100
+Some tests failed.
