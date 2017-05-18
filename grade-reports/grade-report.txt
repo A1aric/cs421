@@ -1,57 +1,73 @@
 Grade report for Sujay Patwardhan
 Programming Languages (cs421) 2017-01
-Report generated 2017-05-12 16:43:21
+Report generated 2017-05-18 16:33:10
 
 
-Factors are {16: 0.0, 11: 5.0, 12: 2.0, 13: 8.0, 14: 8.0, 15: 7.0}
-                    Assignment  Status Points / Max  Norm Weight% Points
-------------------------------------------------------------------------
-            Recursion - Exam 1  Graded     10 /  10 100.0    2.50   2.50
-       Tail Recursion - Exam 1  Graded      0 /  10   0.0    2.50   0.00
- Algebraic Data Types - Exam 1  Graded     10 /  10 100.0    2.50   2.50
-         Writing HOFs - Exam 1  Graded     10 /  10 100.0    2.50   2.50
-           Using HOFs - Exam 1  Graded     10 /  10 100.0    2.50   2.50
-      Lambda Calculus - Exam 1  Graded     10 /  10 100.0    2.50   2.50
-        Continuations - Exam 1  Graded     10 /  10 100.0    2.50   2.50
-         Type Classes - Exam 1  Graded      7 /  10  70.0    2.50   1.75
-    Regular Languages - Exam 2  Graded     10 /  20  50.0    2.86   1.43
-First and Follow Sets - Exam 2  Graded     10 /  10 100.0    2.86   2.86
-               Monads - Exam 2  Graded      7 /  10  70.0    2.86   2.00
-          LL Grammars - Exam 2  Graded     10 /  20  50.0    2.86   1.43
-          LR Grammars - Exam 2  Graded      5 /  10  50.0    2.86   1.43
-            Monotypes - Exam 2  Graded     20 /  20 100.0    2.86   2.86
-          Unification - Exam 2  Graded     10 /  20  50.0    2.86   1.43
-                Haskell - MP 1  Graded    100 / 100 100.0    3.00   3.00
-            Interpreter - MP 2  Graded    100 / 100 100.0    3.00   3.00
-                    CPS - MP 3  Graded    100 / 100 100.0    3.00   3.00
-                  Forth - MP 4  Graded    100 / 100 100.0    3.00   3.00
-                Parsing - MP 5  Graded    100 / 100 100.0    3.00   3.00
-                 Scheme - MP 6 Pending      0 / 100   0.0    0.00   0.00
-        Type Inferencer - MP 7 Pending      0 / 100   0.0    0.00   0.00
-            Interpreter - ML 2  Graded    100 / 100 100.0    7.50   7.50
-                    CPS - ML 3 Dropped    100 / 100 100.0    0.00   0.00
-                  Forth - ML 4  Graded    100 / 100 100.0    7.50   7.50
-                 Scheme - ML 5 Pending      0 / 100   0.0    0.00   0.00
-               Gitlab Activity  Graded      1 /   1 100.0    0.62   0.62
-            Recursion Activity  Graded      2 /   2 100.0    0.62   0.62
-            HOF Activity (fix)  Graded      2 /   2 100.0    0.62   0.62
-               MyList Activity  Graded      1 /   1 100.0    0.62   0.62
-               Lambda Activity  Graded      1 /   1 100.0    0.62   0.62
-                  CPS Activity  Graded      3 /   3 100.0    0.62   0.62
-                Monad Activity  Graded      2 /   2 100.0    0.62   0.62
-                   LL Activity  Graded      3 /   3 100.0    0.62   0.62
+Factors are {16: 14.0, 11: 5.5, 12: 3.0, 13: 8.0, 14: 8.0, 15: 3.0}
+                      Assignment   Status Points / Max  Norm Weight% Points
+---------------------------------------------------------------------------
+              Recursion - Exam 1   Graded     10 /  10 100.0    2.50   2.50
+         Tail Recursion - Exam 1   Graded      0 /  10   0.0    2.50   0.00
+   Algebraic Data Types - Exam 1   Graded     10 /  10 100.0    2.50   2.50
+           Writing HOFs - Exam 1   Graded     10 /  10 100.0    2.50   2.50
+             Using HOFs - Exam 1   Graded     10 /  10 100.0    2.50   2.50
+        Lambda Calculus - Exam 1   Graded     10 /  10 100.0    2.50   2.50
+          Continuations - Exam 1   Graded     10 /  10 100.0    2.50   2.50
+           Type Classes - Exam 1   Graded      7 /  10  70.0    2.50   1.75
+      Regular Languages - Exam 2 Replaced     10 /  20 100.0    0.00   0.00
+  First and Follow Sets - Exam 2   Graded     10 /  10 100.0    6.67   6.67
+                 Monads - Exam 2 Replaced      7 /  10 100.0    0.00   0.00
+            LL Grammars - Exam 2 Replaced     10 /  20 100.0    0.00   0.00
+            LR Grammars - Exam 2 Replaced      5 /  10 100.0    0.00   0.00
+              Monotypes - Exam 2   Graded     20 /  20 100.0    6.67   6.67
+            Unification - Exam 2   Graded     10 /  20  50.0    6.67   3.33
+                  Haskell - MP 1   Graded    100 / 100 100.0    2.73   2.73
+              Interpreter - MP 2   Graded    100 / 100 100.0    2.73   2.73
+                      CPS - MP 3   Graded    100 / 100 100.0    2.73   2.73
+                    Forth - MP 4   Graded    100 / 100 100.0    2.73   2.73
+                  Parsing - MP 5   Graded    100 / 100 100.0    1.36   1.36
+                   Scheme - MP 6   Graded     18 / 100  18.0    2.73   0.49
+              Interpreter - ML 2   Graded    100 / 100 100.0    5.00   5.00
+                      CPS - ML 3   Graded    100 / 100 100.0    5.00   5.00
+                    Forth - ML 4   Graded    100 / 100 100.0    5.00   5.00
+                   Scheme - ML 5  Dropped      0 / 100   0.0    0.00   0.00
+               Recursion - Final   Graded     10 /  10 100.0    1.79   1.79
+    Algebraic Data Types - Final   Graded     10 /  10 100.0    1.79   1.79
+              Using HOFs - Final   Graded     10 /  10 100.0    1.79   1.79
+         Lambda Calculus - Final   Graded      5 /  10  50.0    1.79   0.89
+           Continuations - Final   Graded     10 /  10 100.0    1.79   1.79
+       Regular Languages - Final   Graded     10 /  10 100.0    1.79   1.79
+   First and Follow Sets - Final   Graded     10 /  10 100.0    1.79   1.79
+                  Monads - Final   Graded     10 /  10 100.0    1.79   1.79
+             LL Grammars - Final   Graded     10 /  10 100.0    1.79   1.79
+             LR Grammars - Final   Graded     10 /  10 100.0    1.79   1.79
+               Monotypes - Final   Graded     10 /  10 100.0    1.79   1.79
+             Unification - Final   Graded      5 /  10  50.0    1.79   0.89
+                  Prolog - Final   Graded      5 /  10  50.0    1.79   0.89
+Parameters and Variables - Final   Graded     10 /  10 100.0    1.79   1.79
+                 Gitlab Activity   Graded      1 /   1 100.0    0.62   0.62
+              Recursion Activity   Graded      2 /   2 100.0    0.62   0.62
+              HOF Activity (fix)   Graded      2 /   2 100.0    0.62   0.62
+                 MyList Activity   Graded      1 /   1 100.0    0.62   0.62
+                 Lambda Activity   Graded      1 /   1 100.0    0.62   0.62
+                    CPS Activity   Graded      3 /   3 100.0    0.62   0.62
+                  Monad Activity   Graded      2 /   2 100.0    0.62   0.62
+                     LL Activity   Graded      3 /   3 100.0    0.62   0.62
 
 
 
-Earned points so far:  65.18
-Graded points so far:  75.00
-       Current score: 86.90%
-        Max possible: 90.18%
+Earned points so far:  88.50
+Graded points so far: 100.00
+       Current score: 88.50%
+        Max possible: 88.50%
 
- (Max possible does not take grade replacement from final into account.)
-If you believe there is an error that only affects you, please open an issue on your gitlab account.
-If you believe there is an error likely to be systemic, post a note on Piazza.
+If you believe there is an error, please open an issue on your gitlab account.
+We will *not* be checking Piazza, so please use gitlab or direct email to the instructor.
 
 Notes:
-CPS - ML 3 was dropped.  Its score was 100.0%.
+Monads - Exam 2's score was replaced by Monads - Final.  Its score was 70.0%.
+LR Grammars - Exam 2's score was replaced by LR Grammars - Final.  Its score was 50.0%.
+Regular Languages - Exam 2's score was replaced by Regular Languages - Final.  Its score was 50.0%.
+LL Grammars - Exam 2's score was replaced by LL Grammars - Final.  Its score was 50.0%.
+Scheme - ML 5 was dropped.  Its score was 0.0%.
 
