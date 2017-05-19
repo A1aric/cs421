@@ -1,6 +1,6 @@
 Grade report for Sujay Patwardhan
 Programming Languages (cs421) 2017-01
-Report generated 2017-05-18 19:37:21
+Report generated 2017-05-18 19:57:37
 
 
                       Assignment   Status Points / Max  Norm Weight% Points
@@ -10,7 +10,7 @@ Report generated 2017-05-18 19:37:21
    Algebraic Data Types - Exam 1   Graded     10 /  10 100.0    2.50   2.50
            Writing HOFs - Exam 1   Graded     10 /  10 100.0    2.50   2.50
              Using HOFs - Exam 1   Graded     10 /  10 100.0    2.50   2.50
-        Lambda Calculus - Exam 1   Graded     10 /  10 100.0    2.50   2.50
+        Lambda Calculus - Exam 1   Graded      5 /  10  50.0    2.50   1.25
           Continuations - Exam 1   Graded     10 /  10 100.0    2.50   2.50
            Type Classes - Exam 1   Graded      7 /  10  70.0    2.50   1.75
       Regular Languages - Exam 2 Replaced     10 /  20 100.0    2.86   2.86
@@ -55,10 +55,10 @@ Parameters and Variables - Final   Graded     10 /  10 100.0    1.79   1.79
 
 
 
-Earned points so far:  92.26
+Earned points so far:  91.01
 Graded points so far: 100.00
-       Current score: 92.26%
-        Max possible: 92.26%
+       Current score: 91.01%
+        Max possible: 91.01%
 
 If you believe there is an error, please open an issue on your gitlab account.
 We will *not* be checking Piazza, so please use gitlab or direct email to the instructor.
